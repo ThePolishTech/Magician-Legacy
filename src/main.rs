@@ -57,7 +57,7 @@ async fn main() {
             }
         }
 
-        print!("Reading Bot Token From Enviromental Variable...");
+        print!("Reading Bot Token From Enviromental Variable..."); 
         let bot_token = match env::var("BOT_TOKEN") {
             Ok(token) => {
                 println!("Ok");
