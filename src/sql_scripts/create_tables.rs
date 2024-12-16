@@ -6,7 +6,6 @@ pub const SCRIPT: &str = "
 
         FOREIGN KEY (fk_currentCharacter)
         REFERENCES Characters (pk_CharacterId)
-        
     );
 
     CREATE TABLE  IF NOT EXISTS    Characters

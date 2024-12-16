@@ -8,10 +8,7 @@ use std::{
     env
 };
 use serenity::{
-    model::{
-        gateway::GatewayIntents,
-    },
-    Client
+    model::gateway::GatewayIntents, Client
 };
 
 mod sql_scripts;
@@ -36,7 +33,7 @@ async fn main() {
         // --== LOAD/CREATE DATABASE ==-- //
 
             print!("Opening Connection to Database...");
-            let sqlite_connection = match sqlite::open("kermmaw_db") {
+            let rusqlite_connection = match rusqlite::Connection::open("kermmaw_db") {
                 Ok(conn) => {
                     println!("Ok");
                     conn
@@ -48,7 +45,7 @@ async fn main() {
             };
 
             print!("Running Table Creation Script...");
-            match sqlite_connection.execute( sql_scripts::create_tables::SCRIPT ) {
+            match rusqlite_connection.execute_batch( sql_scripts::create_tables::SCRIPT ) {
                 Ok(_) => {
                     println!("Ok")
                 },
