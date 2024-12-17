@@ -1,3 +1,6 @@
+use std::sync::{Arc,Mutex};
+use serenity::prelude::TypeMapKey;
+
 /// Header that apppears at the top during runtime
 pub const TITLE: &str = "
     // xxxxxxxxxxxxxxxxxxxxxxxx //
@@ -28,3 +31,10 @@ pub fn create_log_message( message: &str, severity: LogLevel ) -> String {
 
     format!("[ {} ]  => {}:  {}", timestamp, log_level_message, message)
 }
+
+/// Container type to hold database connection between contexts
+pub struct DatabaseConnectionContainer;
+impl TypeMapKey for DatabaseConnectionContainer {
+    type Value = Arc<Mutex<rusqlite::Connection>>;
+}
+

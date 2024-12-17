@@ -5,8 +5,10 @@
 // --== CRATES == -- //
 // xxxxxxxxxxxxxxxxx //
 use std::{
-    env
+    env,
+    sync::{Arc,Mutex}
 };
+
 use serenity::{
     model::gateway::GatewayIntents, Client
 };
@@ -14,6 +16,7 @@ use serenity::{
 mod sql_scripts;
 mod event_handler;
 mod utils;
+use utils::DatabaseConnectionContainer;
 //use utils::{
 //    LogLevel,
 //    create_log_message
@@ -28,7 +31,7 @@ async fn main() {
 
     println!( "{}", utils::TITLE );
 
-    let bot_client: Result< serenity::Client, i32 > = 'main: {
+    let bot_client: Result< (serenity::Client, rusqlite::Connection), i32 > = 'main: {
 
         // --== LOAD/CREATE DATABASE ==-- //
 
@@ -79,7 +82,7 @@ async fn main() {
             match Client::builder( bot_token, gateway_intents ).event_handler(event_handler::Handler).await {
                 Ok(client_builder) => {
                     println!("Ok");
-                    break 'main Ok( client_builder )
+                    break 'main Ok( (client_builder, rusqlite_connection) )
                 },
                 Err(why) => {
                     println!("Error: {}", why);
@@ -92,8 +95,10 @@ async fn main() {
     // Start the client
     print!("Starting Client...");
     match bot_client {
-        Ok(mut client) => {
+        Ok( (mut client, rusqlite_connection) ) => {
             println!("Ok\n");
+            let data = client.data.write();
+            data.await.insert::<DatabaseConnectionContainer>(Arc::new( Mutex::new( rusqlite_connection ) ));
             let _ = client.start().await;
         },
         Err(code) => {
