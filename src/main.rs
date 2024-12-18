@@ -15,6 +15,7 @@ use serenity::{
 
 mod sql_scripts;
 mod event_handler;
+mod commands;
 mod utils;
 use utils::DatabaseConnectionContainer;
 //use utils::{
