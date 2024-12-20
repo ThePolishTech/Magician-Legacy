@@ -1,5 +1,8 @@
 use std::sync::{Arc,Mutex};
-use serenity::prelude::TypeMapKey;
+use serenity::{
+    model::Colour,
+    prelude::TypeMapKey,
+};
 
 /// Header that apppears at the top during runtime
 pub const TITLE: &str = "
@@ -38,3 +41,9 @@ impl TypeMapKey for DatabaseConnectionContainer {
     type Value = Arc<Mutex<rusqlite::Connection>>;
 }
 
+pub struct EmbedColours;
+impl EmbedColours {
+    pub const INFO:  Colour = Colour::from_rgb(0, 127, 255);
+    pub const GOOD:  Colour = Colour::from_rgb(0, 255, 127);
+    pub const ERROR: Colour = Colour::from_rgb(255, 127, 0);
+}

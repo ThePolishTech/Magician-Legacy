@@ -15,7 +15,7 @@ pub fn build() -> CreateCommand {
     CreateCommand::new("register")
         .description("Add your profile to the database")
 }
-pub async fn run( interaction_data: &CommandInteraction, ctx: &Context ) -> Result<CreateInteractionResponse, ()> {
+pub async fn run( interaction_data: &CommandInteraction, ctx: &Context ) -> Option<CreateInteractionResponse> {
     
     // We'll use this to grab the Discord ID of the user who called the `/register` command
     // This will be used as the primary key in our `DiscordUsers` database table
@@ -35,7 +35,7 @@ pub async fn run( interaction_data: &CommandInteraction, ctx: &Context ) -> Resu
                     println!("{}",
                         create_log_message("Failed to lock Database Connection", LogLevel::Warning )
                     );
-                    return Err(());
+                    return None;
                 }
             }
         },
@@ -43,7 +43,7 @@ pub async fn run( interaction_data: &CommandInteraction, ctx: &Context ) -> Resu
             println!("{}",
                 create_log_message("Failed to lock Database Connection", LogLevel::Warning )
             );
-            return Err(());
+            return None;
         }
     };
 
@@ -69,16 +69,16 @@ pub async fn run( interaction_data: &CommandInteraction, ctx: &Context ) -> Resu
                     // in the database. In that case we can just inform the invoking user.
                     if error.extended_code == 1555 {
                         CreateEmbed::new()
-                            .title("You're already register")
+                            .title("You're already registered")
                             .description("Want to remove yourself from the database? Use `/unregister`")
                             .colour( EmbedColours::ERROR )
 
                     } else {
-                        return Err(()); // If it didn't fail for that reason, it's an unexepcted failure and
+                        return None; // If it didn't fail for that reason, it's an unexepcted failure and
                                 // should be ok to just fail the interaction
                     }
                 } else {
-                    return Err(());     // I don't *see* why logging it would improve anything. This shouldn't
+                    return None;     // I don't *see* why logging it would improve anything. This shouldn't
                                 // fail under most circumstances. Worst case I'll just add it later
                                 // potentially under a Result so that I dont have to nest ugly
                                 // log-to-console lines
@@ -96,5 +96,6 @@ pub async fn run( interaction_data: &CommandInteraction, ctx: &Context ) -> Resu
     // We do so here:
     let response_message = CreateInteractionResponseMessage::new().embed(return_embed);
     let response = CreateInteractionResponse::Message(response_message);
-    Ok( response )
+    Some( response )
 }
+

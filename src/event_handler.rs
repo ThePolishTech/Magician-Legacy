@@ -1,15 +1,16 @@
 use crate::utils::{
     create_log_message,
-    LogLevel
+    LogLevel,
+    EmbedColours
 };
 
 use serenity::{
-     all::Interaction, async_trait, builder::{
+     all::{Interaction}, async_trait, builder::{
         CreateEmbed, CreateMessage
     }, client::{
         Context, EventHandler
     }, model::{
-        application::Command, gateway::Ready, id::ChannelId, Colour, Timestamp
+        application::Command, gateway::Ready, id::ChannelId, Timestamp
     }
 };
 
@@ -35,7 +36,7 @@ impl EventHandler for Handler {
             // And so, we're gonna need a colour and timestamp for it
             // and also the channel to send it to
             let ( embed_colour, embed_timestamp, wakeup_channel ) = (
-                Colour::from_rgb( 0, 127, 255 ),  // A nice ocean blue
+                EmbedColours::INFO,  // A nice ocean blue
                 Timestamp::now(),
                 ChannelId::from( 1314610244223238317 )  // For now I'm just hard coding it in
             );
@@ -77,14 +78,35 @@ impl EventHandler for Handler {
 
     #[allow(clippy::single_match)]
     async fn interaction_create( &self, ctx: Context, interaction_data: Interaction ) {
+        // Here we see *what* kind of interaction we recived. Based upon that we de what we can and
+        // can't do.
         match interaction_data {
             Interaction::Command( inbound_command_data ) => {
 
-                // Depending on which command was called, execute the right code
-                match inbound_command_data.data.name.clone().as_str() {
-                    "register" => commands::register::run( &inbound_command_data, &ctx ),
-                    _ => {}
+                // Depending on which command was called, execute the right code. We expect a
+                // return type of Option<CreateInteractionRespone> after .await'ing. Theoretically
+                // we could use a Result<T, E> enum to log errors, but I've decided that it would
+                // be better to handle that inside of the function to not force a structure upon
+                // ourseleves. Besdies, we could respond to the interaction inside of the function,
+                // therefore not doing anything more here would be optimal.
+                let response_opt = match inbound_command_data.data.name.clone().as_str() {
+                    "register" => { commands::register::run( &inbound_command_data, &ctx ).await },
+                    _ => { None }
+                };
+
+                if let Some( response ) = response_opt {
+                    // If there is a response message given to us, atempt to send it as a response
+                    // to the interaction. If that fails, log it.
+                    // Although not being a fatal error, not responding to an interaction is still
+                    // unwanted as the user may be missing out on important information
+                    if let Err( why ) = inbound_command_data.create_response( &ctx.http, response ).await {
+                        println!( "{}", create_log_message(
+                                format!("Failed to send response to command interaction:\n\t{why}").as_str(), LogLevel::Error
+                        ))
+                    }
                 }
+
+                
             },
             // Other Stuff will go here. Autocomplete is something I plan to eventually implement 
             _ => {}
