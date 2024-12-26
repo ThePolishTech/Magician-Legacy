@@ -1,3 +1,4 @@
+// The table creation script that we run upon each startup
 pub const SCRIPT: &str = "
     CREATE TABLE  IF NOT EXISTS    DiscordUsers
     (

@@ -36,8 +36,6 @@ pub async fn run( interaction_data: &CommandInteraction, ctx: &Context ) -> Opti
 
     // We need to do a few things
     // 1) Check if user exists in DB, if not, notify and quit early
-    //     --== Here we'd verify and remove the users characters after doing so. Not yet though, ==--
-    //     --== as we don't have all of that implemented yet                                     ==--
     // 2) Remove the DiscordUsers entry by matching the command envoker's Discord ID
 
     let response_embed = {
@@ -78,11 +76,14 @@ pub async fn run( interaction_data: &CommandInteraction, ctx: &Context ) -> Opti
                 .expect("Poisoned flag should already have been cleared");
         // ==--
 
-        // --== TEST FOR DATABASE ENTRY ==-- //
-            
+        // --== TEST DATABASE ENTRIES ==-- //
+        
+            // Before a person can deregister themselves, we need to make sure they don't have any
+            // characters in the databse, and that they even have a profile in the first place
+
+        // --== PROFILE TEST ==-- //    
             // This slash command can be called by any user, even if they're not even in the
-            // database. And given how potentially dangerous this command can be, we need to
-            // notify the user of such an eventuality.
+            // database. So here we'll test to see if the user is in the database.
             let mut testing_statement = database_connection
                 .prepare(discord_users::SELECT_BY_ID)
                 .expect("This should not fail. Only doing so unexpectedly, for no fault of our own");
@@ -98,7 +99,7 @@ pub async fn run( interaction_data: &CommandInteraction, ctx: &Context ) -> Opti
                 
                 let info_embed = CreateEmbed::new()
                     .title("You're not in the database")
-                    .description("That's alright! With nothing to remove, we'll just abort")
+                    .description("That's alright! With nothing to remove, we'll just do nothing more")
                     .colour(EmbedColours::ERROR);
 
                 return Some(
@@ -111,7 +112,7 @@ pub async fn run( interaction_data: &CommandInteraction, ctx: &Context ) -> Opti
         
             // This shouldn't ever be a problem as we have handled the edge case of the user not
             // being in the database. I don't know any way this could error
-            let a = database_connection.execute( discord_users::REMOVE_ENTRY, [&invoking_user_id] );
+            let _ = database_connection.execute( discord_users::REMOVE_ENTRY, [&invoking_user_id] );
 
             let invoking_user_tag = interaction_data.user.tag();
             // Finally, We'll just notify that a profile was removed and who's
@@ -130,10 +131,6 @@ pub async fn run( interaction_data: &CommandInteraction, ctx: &Context ) -> Opti
             //
             // One small issue though, the current database schema doesn't allow for dangeling
             // characters, that can be changed simply though.
-            //
-            // And so
-            // TODO: Adjust Database schema to allow for dangeling (ownerless) characters and
-            // adjust comments here to reflect that now, this command will only remove the profile
             CreateEmbed::new()
                 .title("Your profile has been successfully removed from the database")
                 .description("Your characters, if there were any, are still in the database")
