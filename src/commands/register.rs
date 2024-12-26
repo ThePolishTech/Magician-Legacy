@@ -25,17 +25,19 @@ pub async fn run( interaction_data: &CommandInteraction, ctx: &Context ) -> Opti
     let mut client_data = ctx.data.write().await;
     let database_connection = match client_data.get_mut::<DatabaseConnectionContainer>() {
         Some( connection ) => {
-            match connection.try_lock() {
+            match connection.lock() {
                 Ok( connection ) => {
                     connection
                 },
-                Err( _ ) => {
+                Err( why ) => {
                     // TODO: Add check to see if lock failed due to poisoning or if it's already
                     // locked. If poisoned, replace with new database connection
-                    println!("{}",
-                        create_log_message("Failed to lock Database Connection", LogLevel::Warning )
+                    println!("{}", create_log_message(
+                            format!("Failed to lock Database Connection:\n\t{why}").as_str(),
+                            LogLevel::Warning
+                        )
                     );
-                    return None;
+                    why.into_inner()
                 }
             }
         },
