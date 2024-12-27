@@ -72,7 +72,7 @@ pub async fn run( interaction_data: &CommandInteraction, ctx: &Context ) -> Opti
                     if error.extended_code == 1555 {
                         CreateEmbed::new()
                             .title("You're already registered")
-                            .description("Want to remove yourself from the database? Use `/unregister`")
+                            .description("Want to remove yourself from the database? Use `/deregister`")
                             .colour( EmbedColours::ERROR )
 
                     } else {
