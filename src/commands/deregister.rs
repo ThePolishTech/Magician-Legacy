@@ -1,9 +1,12 @@
 use rusqlite::OptionalExtension;
 use serenity::{
-    all::{CreateInteractionResponse, CreateModal}, builder::{
+    builder::{
         CreateCommand, CreateEmbed,
+        CreateInteractionResponse,
         CreateInteractionResponseMessage
-    }, client::{self, Context}, model::{application::CommandInteraction, connection}
+    },
+    client::Context,
+    model::application::CommandInteraction
 };
 use crate::utils::{
     create_log_message, LogLevel,
@@ -15,18 +18,10 @@ use crate::sql_scripts::discord_users;
 
 
 
-
 pub fn build() -> CreateCommand {
     CreateCommand::new("deregister")
         .description("Remove yourself from the database")
 }
-
-
-/*
-let mut client_data = ctx.data.write().await;
-
-        let database_connection = match client_data.get_mut::<DatabaseConnectionContainer>()
-*/
 
 
 pub async fn run( interaction_data: &CommandInteraction, ctx: &Context ) -> Option<CreateInteractionResponse> {
@@ -133,7 +128,7 @@ pub async fn run( interaction_data: &CommandInteraction, ctx: &Context ) -> Opti
             // characters, that can be changed simply though.
             CreateEmbed::new()
                 .title("Your profile has been successfully removed from the database")
-                .description("Your characters, if there were any, are still in the database")
+                .description("Aaaand cut!")
                 .colour(EmbedColours::GOOD)
         // ==--
     };
