@@ -1,3 +1,5 @@
+use std::{cell::RefCell};
+
 use rusqlite::OptionalExtension;
 use serenity::{
     builder::{
@@ -76,6 +78,14 @@ pub async fn run( interaction_data: &CommandInteraction, ctx: &Context ) -> Opti
             // Before a person can deregister themselves, we need to make sure they don't have any
             // characters in the databse, and that they even have a profile in the first place
 
+            // Because any number of tests could fail, we'll just use this to track if any of them
+            // failed. If so, we break early
+            let mut tests_passed = true;
+            let mut output_embed = CreateEmbed::new()
+                .title("Your profile has been successfully removed from the database")
+                .description("Aaaand cut!")
+                .colour(EmbedColours::GOOD);
+
         // --== PROFILE TEST ==-- //    
             // This slash command can be called by any user, even if they're not even in the
             // database. So here we'll test to see if the user is in the database.
@@ -90,32 +100,42 @@ pub async fn run( interaction_data: &CommandInteraction, ctx: &Context ) -> Opti
             // If our query returns a `None`, that means that the invoking user is not in our
             // database. In that case, we should abort further execution. Not forgetting to notify
             // the invoker of the state of things.
-            if query_result.is_none() {
+            // We do so by overriding the contents of our `output_embed`. The reason we can't set
+            // it inside of the if statement, is that the borrow checker would not like it, so we
+            // might as well just do it this way
+            ( output_embed, tests_passed ) = 
+                if query_result.is_none() {
+                    (
+                        // output_embed
+                        CreateEmbed::new()
+                            .title("You're not in the database")
+                            .description("That's alright! With nothing to remove, we'll just do nothing more")
+                            .colour(EmbedColours::ERROR),
+                        // tests_passed
+                        false
+                    )
+                } else {
+                    // If the test passed, don't change these values
+                    ( output_embed, tests_passed )
+                };
                 
-                let info_embed = CreateEmbed::new()
-                    .title("You're not in the database")
-                    .description("That's alright! With nothing to remove, we'll just do nothing more")
-                    .colour(EmbedColours::ERROR);
-
-                return Some(
-                    CreateInteractionResponse::Message(  CreateInteractionResponseMessage::new().embed(info_embed)  )
-                );
-            }
         // ==--
 
         // --== REMOVE PROFILE ==-- //
-        
+       
             // This shouldn't ever be a problem as we have handled the edge case of the user not
             // being in the database. I don't know any way this could error
-            let _ = database_connection.execute( discord_users::REMOVE_ENTRY, [&invoking_user_id] );
+            if tests_passed {
+                let _ = database_connection.execute( discord_users::REMOVE_ENTRY, [&invoking_user_id] );
 
-            let invoking_user_tag = interaction_data.user.tag();
-            // Finally, We'll just notify that a profile was removed and who's
-            println!( "{}", create_log_message(
-                    format!( "Removed {invoking_user_tag}'s profile from the database" ).as_str(),
-                    LogLevel::Info
-                )
-            );
+                let invoking_user_tag = interaction_data.user.tag();
+                // Finally, We'll just notify that a profile was removed and who's
+                println!( "{}", create_log_message(
+                        format!( "Removed {invoking_user_tag}'s profile from the database" ).as_str(),
+                        LogLevel::Info
+                    )
+                );
+            }
         // ==--
 
 
@@ -126,10 +146,7 @@ pub async fn run( interaction_data: &CommandInteraction, ctx: &Context ) -> Opti
             //
             // One small issue though, the current database schema doesn't allow for dangeling
             // characters, that can be changed simply though.
-            CreateEmbed::new()
-                .title("Your profile has been successfully removed from the database")
-                .description("Aaaand cut!")
-                .colour(EmbedColours::GOOD)
+            output_embed
         // ==--
     };
     
