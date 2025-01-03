@@ -1,6 +1,3 @@
-// --== ATTRIBUTES ==-- //
-#![allow(unused_braces)]
-
 // xxxxxxxxxxxxxxxxx //
 // --== CRATES == -- //
 // xxxxxxxxxxxxxxxxx //
@@ -18,10 +15,6 @@ mod event_handler;
 mod commands;
 mod utils;
 use utils::DatabaseConnectionContainer;
-//use utils::{
-//    LogLevel,
-//    create_log_message
-//};
 
 
 // xxxxxxxxxxxxxx //
@@ -60,21 +53,23 @@ async fn main() {
             }
         // ==--
 
-        // Verify that there is a bot token in enviroment
-        print!("Reading Bot Token From Enviromental Variable..."); 
-        let bot_token = match env::var("BOT_TOKEN") {
-            Ok(token) => {
-                println!("Ok");
-                token
-            },
-            Err(_) => {
-                println!("Error: Missing Token in Enviroment");
-                break 'main Err( 1 );
-            }
-        };
+        // --== READ BOT TOKEN FROM ENVIROMENT ==-- //
+
+            print!("Reading Bot Token From Enviromental Variable..."); 
+            let bot_token = match env::var("BOT_TOKEN") {
+                Ok(token) => {
+                    println!("Ok");
+                    token
+                },
+                Err(_) => {
+                    println!("Error: Missing Token in Enviroment");
+                    break 'main Err( 1 );
+                }
+            };
+        // ==--
 
         // --== SETUP CONNECTION TO GATEWAY ==-- //   
-
+            
             let gateway_intents = GatewayIntents::GUILD_MESSAGES
                 | GatewayIntents::MESSAGE_CONTENT
                 | GatewayIntents::GUILD_MESSAGE_REACTIONS;
@@ -93,18 +88,24 @@ async fn main() {
         // ==--
     };
 
-    // Start the client
-    print!("Starting Client...");
-    match bot_client {
-        Ok( (mut client, rusqlite_connection) ) => {
-            println!("Ok\n");
-            let data = client.data.write();
-            data.await.insert::<DatabaseConnectionContainer>(Arc::new( Mutex::new( rusqlite_connection ) ));
-            let _ = client.start().await;
-        },
-        Err(code) => {
-            println!("Error: Code {}\n", code);
+    // --== START CLIENT ==-- //
+        
+        print!("Starting Client...");
+        match bot_client {
+            Ok( (mut client, rusqlite_connection) ) => {
+                println!("Ok\n");
+
+                // Pass database connection into client's data
+                let data = client.data.write();
+                data.await.insert::<DatabaseConnectionContainer>(Arc::new( Mutex::new( rusqlite_connection ) ));
+                
+                // Start the client
+                let _ = client.start().await;
+            },
+            Err(code) => {
+                println!("Error: Code {}\n", code);
+            }
         }
-    }
+    // ==--
 }
 
