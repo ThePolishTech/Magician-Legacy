@@ -1,14 +1,12 @@
-use std::{cell::RefCell};
-
 use rusqlite::OptionalExtension;
 use serenity::{
     builder::{
         CreateCommand, CreateEmbed,
         CreateInteractionResponse,
-        CreateInteractionResponseMessage
+        CreateInteractionResponseMessage,
+        EditInteractionResponse
     },
-    client::Context,
-    model::application::CommandInteraction
+    client::Context, model::application::CommandInteraction
 };
 use crate::utils::{
     create_log_message, LogLevel,
@@ -29,10 +27,13 @@ pub fn build() -> CreateCommand {
 pub async fn run( interaction_data: &CommandInteraction, ctx: &Context ) -> Option<CreateInteractionResponse> {
 
     let invoking_user_id = interaction_data.user.id.get();
-    
+    let _ = interaction_data.create_response(&ctx.http, CreateInteractionResponse::Defer(
+            CreateInteractionResponseMessage::new()
+    )).await;
 
     // We need to do a few things
-    // 1) Check if user exists in DB, if not, notify and quit early
+    // 1) Run some tests to see if the user profile can be safetly removed
+    //        # uses a fallthrough system, where 
     // 2) Remove the DiscordUsers entry by matching the command envoker's Discord ID
 
     let response_embed = {
@@ -150,8 +151,18 @@ pub async fn run( interaction_data: &CommandInteraction, ctx: &Context ) -> Opti
         // ==--
     };
     
-    Some(
-        CreateInteractionResponse::Message(  CreateInteractionResponseMessage::new().embed(response_embed)  )
-    )
+    //Some(
+    //    CreateInteractionResponse::Message(  CreateInteractionResponseMessage::new().embed(response_embed)  )
+    //);
+    
+    if let Err( why ) = interaction_data.edit_response(
+        &ctx.http,
+        EditInteractionResponse::new().embed(response_embed)
+    ).await
+    {
+        println!("{}", why );
+    }
+
+    None
 }
 
