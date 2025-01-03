@@ -33,8 +33,7 @@ pub async fn run( interaction_data: &CommandInteraction, ctx: &Context ) -> Opti
 
     // We need to do a few things
     // 1) Run some tests to see if the user profile can be safetly removed
-    //        # uses a fallthrough system, where 
-    // 2) Remove the DiscordUsers entry by matching the command envoker's Discord ID
+    // 2) If all tests have passed; remove the DiscordUsers entry by matching the command envoker's Discord ID
 
     let response_embed = {
         
@@ -80,52 +79,55 @@ pub async fn run( interaction_data: &CommandInteraction, ctx: &Context ) -> Opti
             // characters in the databse, and that they even have a profile in the first place
 
             // Because any number of tests could fail, we'll just use this to track if any of them
-            // failed. If so, we break early
+            // failed. If so, we commit the error message and raise a flag
             let mut tests_passed = true;
             let mut output_embed = CreateEmbed::new()
                 .title("Your profile has been successfully removed from the database")
                 .description("Aaaand cut!")
                 .colour(EmbedColours::GOOD);
 
-        // --== PROFILE TEST ==-- //    
-            // This slash command can be called by any user, even if they're not even in the
-            // database. So here we'll test to see if the user is in the database.
-            let mut testing_statement = database_connection
-                .prepare(discord_users::SELECT_BY_ID)
-                .expect("This should not fail. Only doing so unexpectedly, for no fault of our own");
-            
-            let query_result = testing_statement.query_row( [&invoking_user_id], |row| row.get::<usize, u64>(0) )
-                .optional()
-                .expect("This should not fail. Only doing so unexpectedly, for no fault of our own");
-            
-            // If our query returns a `None`, that means that the invoking user is not in our
-            // database. In that case, we should abort further execution. Not forgetting to notify
-            // the invoker of the state of things.
-            // We do so by overriding the contents of our `output_embed`. The reason we can't set
-            // it inside of the if statement, is that the borrow checker would not like it, so we
-            // might as well just do it this way
-            ( output_embed, tests_passed ) = 
-                if query_result.is_none() {
-                    (
-                        // output_embed
-                        CreateEmbed::new()
-                            .title("You're not in the database")
-                            .description("That's alright! With nothing to remove, we'll just do nothing more")
-                            .colour(EmbedColours::ERROR),
-                        // tests_passed
-                        false
-                    )
-                } else {
-                    // If the test passed, don't change these values
-                    ( output_embed, tests_passed )
-                };
+            // --== PROFILE TEST ==-- //   
+
+                // This slash command can be called by any user, even if they're not even in the
+                // database. So here we'll test to see if the user is in the database.
+                let mut testing_statement = database_connection
+                    .prepare(discord_users::SELECT_BY_ID)
+                    .expect("This should not fail. Only doing so unexpectedly, for no fault of our own");
                 
+                let query_result = testing_statement.query_row( [&invoking_user_id], |row| row.get::<usize, u64>(0) )
+                    .optional()
+                    .expect("This should not fail. Only doing so unexpectedly, for no fault of our own");
+                
+                // If our query returns a `None`, that means that the invoking user is not in our
+                // database. In that case, we should abort further execution. Not forgetting to notify
+                // the invoker of the state of things.
+                // We do so by overriding the contents of our `output_embed`. The reason we can't set
+                // it inside of the if statement, is that the borrow checker would not like it, so we
+                // might as well just do it this way
+                ( output_embed, tests_passed ) = 
+                    if query_result.is_none() {
+                        (
+                            // output_embed
+                            CreateEmbed::new()
+                                .title("You're not in the database")
+                                .description("That's alright! With nothing to remove, we'll just do nothing more")
+                                .colour(EmbedColours::ERROR),
+                            // tests_passed
+                            false
+                        )
+                    } else {
+                        // If the test passed, don't change these values
+                        ( output_embed, tests_passed )
+                    };
+                    
+            // ==--
         // ==--
 
         // --== REMOVE PROFILE ==-- //
        
-            // This shouldn't ever be a problem as we have handled the edge case of the user not
-            // being in the database. I don't know any way this could error
+            // If all of the tests passed, we can continue by running the SQL query.
+            // If it doesn't pass, we don't do anything, the failure embed will just
+            // pass on through
             if tests_passed {
                 let _ = database_connection.execute( discord_users::REMOVE_ENTRY, [&invoking_user_id] );
 
@@ -150,10 +152,6 @@ pub async fn run( interaction_data: &CommandInteraction, ctx: &Context ) -> Opti
             output_embed
         // ==--
     };
-    
-    //Some(
-    //    CreateInteractionResponse::Message(  CreateInteractionResponseMessage::new().embed(response_embed)  )
-    //);
     
     if let Err( why ) = interaction_data.edit_response(
         &ctx.http,
