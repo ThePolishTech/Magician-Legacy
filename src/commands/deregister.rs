@@ -1,7 +1,8 @@
 use rusqlite::OptionalExtension;
 use serenity::{
     builder::{
-        CreateCommand, CreateEmbed,
+        CreateCommand,
+        CreateEmbed, CreateEmbedFooter,
         CreateInteractionResponse,
         CreateInteractionResponseMessage,
         EditInteractionResponse
@@ -15,6 +16,13 @@ use crate::utils::{
 };
 use crate::sql_scripts::discord_users;
 
+// Conveniance function so that we don't have to write the format every single time
+fn footer_test_index( test_index: u8, test_count: u8 ) -> CreateEmbedFooter {
+    CreateEmbedFooter::new(
+        format!( "Test {test_index}/{test_count}" )
+    )
+}
+
 
 
 
@@ -26,20 +34,22 @@ pub fn build() -> CreateCommand {
 
 pub async fn run( interaction_data: &CommandInteraction, ctx: &Context ) -> Option<CreateInteractionResponse> {
 
+    // We'll be using the user's ID quite often, so lets just save it here for future use
     let invoking_user_id = interaction_data.user.id.get();
-    let _ = interaction_data.create_response(&ctx.http, CreateInteractionResponse::Defer(
-            CreateInteractionResponseMessage::new()
-    )).await;
 
-    // We need to do a few things
-    // 1) Run some tests to see if the user profile can be safetly removed
-    // 2) If all tests have passed; remove the DiscordUsers entry by matching the command envoker's Discord ID
+    // Because we'll be doing plenty of SQLite queries, even if theoretically and practically those
+    // won't take long, I personally think it's a good idea to first aknowlage the user's command 
+    let _ = interaction_data
+        .create_response(&ctx.http, CreateInteractionResponse::Defer( CreateInteractionResponseMessage::new() ))
+        .await;
 
-    let response_embed = {
-        
+
+    // Because we are taking the database connection from inside a mutex, if we don't drop it
+    // before we attempt to return from the function the compiler will be displeased. Not really an
+    // issue for us. We'll just use a code block
+    let embed_for_message = {
+
         // --== LOCK THE DATABASE CONNECTION FOR FURTHER USE ==-- //
-
-            // We put it in a block to keep it from blocking us from sending a response on `interaction_data`
 
             // Get the `Arc<Mutex<...>>` we passed into `client.data`. And because we passed it we
             // know it WILL be there, as a result we can just `.expect()` the `Option<...>` that
@@ -72,95 +82,103 @@ pub async fn run( interaction_data: &CommandInteraction, ctx: &Context ) -> Opti
                 .lock()
                 .expect("Poisoned flag should already have been cleared");
         // ==--
-
-        // --== TEST DATABASE ENTRIES ==-- //
         
-            // Before a person can deregister themselves, we need to make sure they don't have any
-            // characters in the databse, and that they even have a profile in the first place
+        // --== TESTS WHETHER PROFILE CAN BE DELETED ==-- //
+        
+            // Before we can safetly remove the user's profile, we need to check a few things. To
+            // do so we'll have a code block that returns a result containing a `CreateEmbed` in
+            // both variants, but the result's type will tell us whether we can proceed to remove
+            // the user's profile
+            let return_embed_result: Result<CreateEmbed, CreateEmbed> = 'test_block: {
 
-            // Because any number of tests could fail, we'll just use this to track if any of them
-            // failed. If so, we commit the error message and raise a flag
-            let mut tests_passed = true;
-            let mut output_embed = CreateEmbed::new()
-                .title("Your profile has been successfully removed from the database")
-                .description("Aaaand cut!")
-                .colour(EmbedColours::GOOD);
+                // If a first time user runs this command without fuffiling any of it's
+                // requirements, they could be met with error after error frustrating them.
+                // As a result, to help deal with any potential frustrations, each error embed
+                // will contain a footer saying which test out of how many has failed. To make
+                // sure it is kept in sync, this varable makes sure we only need to change the
+                // count in one spot
+                let total_test_count = 1;
 
-            // --== PROFILE TEST ==-- //   
-
-                // This slash command can be called by any user, even if they're not even in the
-                // database. So here we'll test to see if the user is in the database.
-                let mut testing_statement = database_connection
-                    .prepare(discord_users::SELECT_BY_ID)
-                    .expect("This should not fail. Only doing so unexpectedly, for no fault of our own");
-                
-                let query_result = testing_statement.query_row( [&invoking_user_id], |row| row.get::<usize, u64>(0) )
-                    .optional()
-                    .expect("This should not fail. Only doing so unexpectedly, for no fault of our own");
-                
-                // If our query returns a `None`, that means that the invoking user is not in our
-                // database. In that case, we should abort further execution. Not forgetting to notify
-                // the invoker of the state of things.
-                // We do so by overriding the contents of our `output_embed`. The reason we can't set
-                // it inside of the if statement, is that the borrow checker would not like it, so we
-                // might as well just do it this way
-                ( output_embed, tests_passed ) = 
-                    if query_result.is_none() {
-                        (
-                            // output_embed
-                            CreateEmbed::new()
-                                .title("You're not in the database")
-                                .description("That's alright! With nothing to remove, we'll just do nothing more")
-                                .colour(EmbedColours::ERROR),
-                            // tests_passed
-                            false
-                        )
-                    } else {
-                        // If the test passed, don't change these values
-                        ( output_embed, tests_passed )
-                    };
+                // --== PROFILE TEST ==-- //
                     
-            // ==--
+                    // One of the first things we need to check is whether the user exists in the
+                    // database already or not. We'll use a database query here, however preparing
+                    // and executing it could potentially error. This would only really happen in
+                    // rare circumstances which we neither plan nor expect to happen. In this case
+                    // we can just safely use a expect(). Granted a panic could result if something
+                    // happens, but given we are operating in Tokio threads, the only thing the end
+                    // user will see is a "command interaction failed", which is acceptable in this
+                    // case.
+                    let mut database_query = database_connection
+                        .prepare( discord_users::SELECT_BY_ID )
+                        .expect("This should not fail. Only doing so unexpectedly, for no fault of our own");
+
+                    let database_query_result = database_query.query_row( [&invoking_user_id], |row| row.get::<usize, u64>(0) )
+                        .optional()
+                        .expect("This should not fail. Only doing so unexpectedly, for no fault of our own");
+
+                    if database_query_result.is_none() {
+                        let error_embed = CreateEmbed::new()
+                            .title("You're not in the database")
+                            .description("That's alright! With nothing to remove, we'll just do nothing more")
+                            .footer( footer_test_index(1, total_test_count) )
+                            .colour(EmbedColours::ERROR);
+                        
+                        break 'test_block Err( error_embed );
+                    }
+                // ==--
+                
+                // --== RETURN SUCCESS EMBED ==-- //
+                
+                    // If we got to this point of the code, that means all tests have passed.
+                    // Otherwise we would have broken out of this code block earlier. And so
+                    // we can return a general 'success embed'
+                    let success_embed = CreateEmbed::new()
+                        .title( "Your profile has been successfully removed from the database" )
+                        .description( "Aaaaand cut!" )
+                        .colour( EmbedColours::GOOD );
+
+                    Ok( success_embed )
+                // ==-- 
+            };
         // ==--
-
-        // --== REMOVE PROFILE ==-- //
-       
-            // If all of the tests passed, we can continue by running the SQL query.
-            // If it doesn't pass, we don't do anything, the failure embed will just
-            // pass on through
-            if tests_passed {
-                let _ = database_connection.execute( discord_users::REMOVE_ENTRY, [&invoking_user_id] );
-
-                let invoking_user_tag = interaction_data.user.tag();
-                // Finally, We'll just notify that a profile was removed and who's
-                println!( "{}", create_log_message(
-                        format!( "Removed {invoking_user_tag}'s profile from the database" ).as_str(),
-                        LogLevel::Info
-                    )
-                );
-            }
-        // ==--
-
-
-        // --== FINAL INFO ==-- //
         
-            // Finally we create the embed that'll tell the user that invoked this command that
-            // their profile has been removed, but their characters are still there.
-            //
-            // One small issue though, the current database schema doesn't allow for dangeling
-            // characters, that can be changed simply though.
-            output_embed
+        // --== REMOVE PROFILE OR EXIT WITH MESSAGE ==-- //
+        
+            // Both variants of our result contain an embed and regardless of which variant we
+            // obtain, we will want to display that embed. However in the case of a Ok variant
+            // it means all of our tests have passed and we can preform a query to remove our
+            // user's profile from the database
+            match return_embed_result {
+                Ok( embed ) => {
+                    
+                    // Remove the user's profile
+                    let _ = database_connection.execute( discord_users::REMOVE_ENTRY, [&invoking_user_id] );
+
+                    // Get the user's unique tag, this is for our log message to be more readable
+                    let invoking_user_tag = interaction_data.user.tag();
+
+                    // Finally, We'll just notify that a profile was removed and who's
+                    println!( "{}", create_log_message(
+                            format!( "Removed {invoking_user_tag}'s profile from the database" ).as_str(),
+                            LogLevel::Info
+                        )
+                    );
+
+                    embed
+                },
+                Err( embed ) => embed
+            }
         // ==--
     };
     
-    if let Err( why ) = interaction_data.edit_response(
-        &ctx.http,
-        EditInteractionResponse::new().embed(response_embed)
-    ).await
-    {
+    // We change the earlier aknowlagement to the message we want to send
+    if let Err( why ) = interaction_data.edit_response( &ctx.http, EditInteractionResponse::new().embed(embed_for_message) ).await {
         println!("{}", why );
     }
 
+    // We manage sending the resulting message here in this function, no need to send a message
+    // back up the pipe. So we'll just return a None
     None
 }
 
