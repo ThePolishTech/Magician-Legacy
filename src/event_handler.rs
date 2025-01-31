@@ -66,7 +66,8 @@ impl EventHandler for Handler {
         
             let slash_commands = vec![
                 commands::register::build(),
-                commands::deregister::build()
+                commands::deregister::build(),
+                commands::tmp::build()
             ];
 
             if let Err( why ) = Command::set_global_commands( &ctx.http, slash_commands ).await {
@@ -93,6 +94,7 @@ impl EventHandler for Handler {
                 let response_opt = match inbound_command_data.data.name.clone().as_str() {
                     "register" => { commands::register::run( &inbound_command_data, &ctx ).await },
                     "deregister" => { commands::deregister::run( &inbound_command_data, &ctx).await },
+                    "tmp" => { commands::tmp::run( &inbound_command_data, &ctx).await } 
                     _ => { None }
                 };
 

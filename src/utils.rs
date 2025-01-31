@@ -47,3 +47,4 @@ impl EmbedColours {
     pub const GOOD:  Colour = Colour::from_rgb(0, 255, 127);
     pub const ERROR: Colour = Colour::from_rgb(255, 127, 0);
 }
+
