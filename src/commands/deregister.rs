@@ -171,9 +171,15 @@ pub async fn run( interaction_data: &CommandInteraction, ctx: &Context ) -> Opti
             }
         // ==--
     };
-    
+
+    // We prepare a `EditInteractionResponse` with our embed to send and then prepare a payload
+    // that we await in a further-down `if let` block to send our new embed to the end user
+    let new_message = EditInteractionResponse::new().embed(embed_for_message);
+    let edit_response_payload = interaction_data.edit_response( &ctx.http, new_message );
+
+
     // We change the earlier aknowlagement to the message we want to send
-    if let Err( why ) = interaction_data.edit_response( &ctx.http, EditInteractionResponse::new().embed(embed_for_message) ).await {
+    if let Err( why ) = edit_response_payload.await {
         println!("{}", why );
     }
 
