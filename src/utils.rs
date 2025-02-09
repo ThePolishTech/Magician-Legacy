@@ -23,7 +23,7 @@ pub enum LogLevel {
 pub fn create_log_message( message: &str, severity: LogLevel ) -> String {
 
     let current_time = chrono::offset::Local::now();
-    let timestamp = current_time.format("%d-%m-%Y | %H:%M:%S").to_string();
+    let timestamp = current_time.format("%Y-%m-%d | %H:%M:%S").to_string();
 
     let log_level_message = match severity {
         LogLevel::Fatal   => "FATAL",
