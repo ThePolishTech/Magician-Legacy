@@ -16,23 +16,17 @@ use crate::sql_scripts::discord_users;
 pub fn build() -> CreateCommand {
     CreateCommand::new("tmp")
         .description("Testing some stuff")
-        .add_option(CreateCommandOption::new(CommandOptionType::String, "test", "Autocomplete? Please?").set_autocomplete(true))
+        .add_option(CreateCommandOption::new(CommandOptionType::String, "test", "Autocomplete? Please?").set_autocomplete(true).required(true))
 }
 pub async fn run( interaction_data: &CommandInteraction, ctx: &Context ) -> Option<CreateInteractionResponse> {
     
-    let toml = r#"
-    character_name = "Test"
-
-    "#;
-
-
-    let attachment = CreateAttachment::bytes("Hello World", "Test File.txt");
+    let options = &interaction_data.data.options;
+    println!("{:?}", options[0].value);
     
 
     let response = CreateInteractionResponse::Message(
         CreateInteractionResponseMessage::new()
             .content("Test")
-            .add_file(attachment)
     );
 
     if let Err( why ) = interaction_data.create_response( &ctx.http, response).await {
