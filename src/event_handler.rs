@@ -113,6 +113,7 @@ impl EventHandler for Handler {
                 
             },
             // Other Stuff will go here. Autocomplete is something I plan to eventually implement 
+            Interaction::Autocomplete( autocomplete_data ) => commands::tmp::handle_autocomplete( &autocomplete_data, &ctx ).await,
             _ => {}
         }
     }

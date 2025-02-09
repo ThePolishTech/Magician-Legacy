@@ -1,0 +1,1057 @@
+[H[J[3J
+    // xxxxxxxxxxxxxxxxxxxxxxxx //
+   //  --== MAGICIAN BOT ==--  //
+  // xxxxxxxxxxxxxxxxxxxxxxxx //
+
+Opening Connection to Database...Ok
+Running Table Creation Script...Ok
+Reading Bot Token From Enviromental Variable...Ok
+Building Client...Ok
+Starting Client...Ok
+
+[ 2025-02-09 | 16:35:59 ]  =>  INFO:  Connected to Gateway; Bot Online
+CommandInteraction {
+    id: InteractionId(
+        InnerId(
+            1338171126681174026,
+        ),
+    ),
+    application_id: ApplicationId(
+        InnerId(
+            1307619903909662750,
+        ),
+    ),
+    data: CommandData {
+        id: CommandId(
+            InnerId(
+                1329712081506795531,
+            ),
+        ),
+        name: "tmp",
+        kind: ChatInput,
+        resolved: CommandDataResolved {
+            users: {},
+            members: {},
+            roles: {},
+            channels: {},
+            messages: {},
+            attachments: {},
+        },
+        options: [
+            CommandDataOption {
+                name: "test",
+                value: Autocomplete {
+                    kind: String,
+                    value: "never",
+                },
+            },
+        ],
+        guild_id: None,
+        target_id: None,
+    },
+    guild_id: Some(
+        GuildId(
+            InnerId(
+                1271900062502486137,
+            ),
+        ),
+    ),
+    channel: Some(
+        PartialChannel {
+            id: ChannelId(
+                InnerId(
+                    1314610306500268032,
+                ),
+            ),
+            name: Some(
+                "magician-testing",
+            ),
+            kind: Text,
+            permissions: Some(
+                Permissions(
+                    2111062325329919,
+                ),
+            ),
+            thread_metadata: None,
+            parent_id: Some(
+                ChannelId(
+                    InnerId(
+                        1314610123188211803,
+                    ),
+                ),
+            ),
+        },
+    ),
+    channel_id: ChannelId(
+        InnerId(
+            1314610306500268032,
+        ),
+    ),
+    member: Some(
+        Member {
+            user: User {
+                id: UserId(
+                    InnerId(
+                        394212669114286090,
+                    ),
+                ),
+                name: "thepolishtech",
+                discriminator: None,
+                global_name: Some(
+                    "ThePolishTech",
+                ),
+                avatar: Some(
+                    "cb1f3a2da2e069b591721ceebbd0b7e6",
+                ),
+                bot: false,
+                system: false,
+                mfa_enabled: false,
+                banner: None,
+                accent_colour: None,
+                locale: None,
+                verified: None,
+                email: None,
+                flags: UserPublicFlags(
+                    0,
+                ),
+                premium_type: None,
+                public_flags: Some(
+                    UserPublicFlags(
+                        4194560,
+                    ),
+                ),
+                member: None,
+            },
+            nick: None,
+            avatar: None,
+            roles: [
+                RoleId(
+                    InnerId(
+                        1272516068791025794,
+                    ),
+                ),
+            ],
+            joined_at: Some(
+                Timestamp(
+                    2024-08-10T18:36:46.293Z,
+                ),
+            ),
+            premium_since: None,
+            deaf: false,
+            mute: false,
+            flags: GuildMemberFlags(
+                0,
+            ),
+            pending: false,
+            permissions: Some(
+                Permissions(
+                    2111062325329919,
+                ),
+            ),
+            communication_disabled_until: None,
+            guild_id: GuildId(
+                InnerId(
+                    1271900062502486137,
+                ),
+            ),
+            unusual_dm_activity_until: None,
+        },
+    ),
+    user: User {
+        id: UserId(
+            InnerId(
+                394212669114286090,
+            ),
+        ),
+        name: "thepolishtech",
+        discriminator: None,
+        global_name: Some(
+            "ThePolishTech",
+        ),
+        avatar: Some(
+            "cb1f3a2da2e069b591721ceebbd0b7e6",
+        ),
+        bot: false,
+        system: false,
+        mfa_enabled: false,
+        banner: None,
+        accent_colour: None,
+        locale: None,
+        verified: None,
+        email: None,
+        flags: UserPublicFlags(
+            0,
+        ),
+        premium_type: None,
+        public_flags: Some(
+            UserPublicFlags(
+                4194560,
+            ),
+        ),
+        member: None,
+    },
+    token: "aW50ZXJhY3Rpb246MTMzODE3MTEyNjY4MTE3NDAyNjo4WWl4MkhCdzJxcml3QnE5cFZxMWlKZEN0eFVuSXlhY1JOa1ZlWmVhVVdKQ3ZOTkl1eVhvYVlCYkdnZ2UwblNuanN0MjB3SUF2enRrMmVCWmVpMUpZSkFCS0JIQTdsOTZZYkQ0SmlFU0xtZ01yZGFSOW0xWlZXWnh0NDkyZ01BZQ",
+    version: 1,
+    app_permissions: Some(
+        Permissions(
+            2107735977479745,
+        ),
+    ),
+    locale: "en-GB",
+    guild_locale: Some(
+        "en-US",
+    ),
+    entitlements: [],
+    authorizing_integration_owners: AuthorizingIntegrationOwners(
+        [
+            GuildInstall(
+                Some(
+                    GuildId(
+                        InnerId(
+                            1271900062502486137,
+                        ),
+                    ),
+                ),
+            ),
+        ],
+    ),
+    context: Some(
+        Guild,
+    ),
+}
+CommandInteraction {
+    id: InteractionId(
+        InnerId(
+            1338171128639656019,
+        ),
+    ),
+    application_id: ApplicationId(
+        InnerId(
+            1307619903909662750,
+        ),
+    ),
+    data: CommandData {
+        id: CommandId(
+            InnerId(
+                1329712081506795531,
+            ),
+        ),
+        name: "tmp",
+        kind: ChatInput,
+        resolved: CommandDataResolved {
+            users: {},
+            members: {},
+            roles: {},
+            channels: {},
+            messages: {},
+            attachments: {},
+        },
+        options: [
+            CommandDataOption {
+                name: "test",
+                value: Autocomplete {
+                    kind: String,
+                    value: "never",
+                },
+            },
+        ],
+        guild_id: None,
+        target_id: None,
+    },
+    guild_id: Some(
+        GuildId(
+            InnerId(
+                1271900062502486137,
+            ),
+        ),
+    ),
+    channel: Some(
+        PartialChannel {
+            id: ChannelId(
+                InnerId(
+                    1314610306500268032,
+                ),
+            ),
+            name: Some(
+                "magician-testing",
+            ),
+            kind: Text,
+            permissions: Some(
+                Permissions(
+                    2111062325329919,
+                ),
+            ),
+            thread_metadata: None,
+            parent_id: Some(
+                ChannelId(
+                    InnerId(
+                        1314610123188211803,
+                    ),
+                ),
+            ),
+        },
+    ),
+    channel_id: ChannelId(
+        InnerId(
+            1314610306500268032,
+        ),
+    ),
+    member: Some(
+        Member {
+            user: User {
+                id: UserId(
+                    InnerId(
+                        394212669114286090,
+                    ),
+                ),
+                name: "thepolishtech",
+                discriminator: None,
+                global_name: Some(
+                    "ThePolishTech",
+                ),
+                avatar: Some(
+                    "cb1f3a2da2e069b591721ceebbd0b7e6",
+                ),
+                bot: false,
+                system: false,
+                mfa_enabled: false,
+                banner: None,
+                accent_colour: None,
+                locale: None,
+                verified: None,
+                email: None,
+                flags: UserPublicFlags(
+                    0,
+                ),
+                premium_type: None,
+                public_flags: Some(
+                    UserPublicFlags(
+                        4194560,
+                    ),
+                ),
+                member: None,
+            },
+            nick: None,
+            avatar: None,
+            roles: [
+                RoleId(
+                    InnerId(
+                        1272516068791025794,
+                    ),
+                ),
+            ],
+            joined_at: Some(
+                Timestamp(
+                    2024-08-10T18:36:46.293Z,
+                ),
+            ),
+            premium_since: None,
+            deaf: false,
+            mute: false,
+            flags: GuildMemberFlags(
+                0,
+            ),
+            pending: false,
+            permissions: Some(
+                Permissions(
+                    2111062325329919,
+                ),
+            ),
+            communication_disabled_until: None,
+            guild_id: GuildId(
+                InnerId(
+                    1271900062502486137,
+                ),
+            ),
+            unusual_dm_activity_until: None,
+        },
+    ),
+    user: User {
+        id: UserId(
+            InnerId(
+                394212669114286090,
+            ),
+        ),
+        name: "thepolishtech",
+        discriminator: None,
+        global_name: Some(
+            "ThePolishTech",
+        ),
+        avatar: Some(
+            "cb1f3a2da2e069b591721ceebbd0b7e6",
+        ),
+        bot: false,
+        system: false,
+        mfa_enabled: false,
+        banner: None,
+        accent_colour: None,
+        locale: None,
+        verified: None,
+        email: None,
+        flags: UserPublicFlags(
+            0,
+        ),
+        premium_type: None,
+        public_flags: Some(
+            UserPublicFlags(
+                4194560,
+            ),
+        ),
+        member: None,
+    },
+    token: "aW50ZXJhY3Rpb246MTMzODE3MTEyODYzOTY1NjAxOTp1bVdCaWJ4QWU1NVVUWHExZm9KblQ1dENZMWU3VXNHcnJlMXNlM3o2ODJGOGFxV3o2UHJ4b01UNWZEYW9qSXVraEQzU2kzRzBxSFZISzZMcjJHckZmMXFUZ0FYUUNidmdFM2F0VDY2UWpEWUdLZ3ZYM1ZPam9lYXBGbGRhbmtiNQ",
+    version: 1,
+    app_permissions: Some(
+        Permissions(
+            2107735977479745,
+        ),
+    ),
+    locale: "en-GB",
+    guild_locale: Some(
+        "en-US",
+    ),
+    entitlements: [],
+    authorizing_integration_owners: AuthorizingIntegrationOwners(
+        [
+            GuildInstall(
+                Some(
+                    GuildId(
+                        InnerId(
+                            1271900062502486137,
+                        ),
+                    ),
+                ),
+            ),
+        ],
+    ),
+    context: Some(
+        Guild,
+    ),
+}
+CommandInteraction {
+    id: InteractionId(
+        InnerId(
+            1338171132041232405,
+        ),
+    ),
+    application_id: ApplicationId(
+        InnerId(
+            1307619903909662750,
+        ),
+    ),
+    data: CommandData {
+        id: CommandId(
+            InnerId(
+                1329712081506795531,
+            ),
+        ),
+        name: "tmp",
+        kind: ChatInput,
+        resolved: CommandDataResolved {
+            users: {},
+            members: {},
+            roles: {},
+            channels: {},
+            messages: {},
+            attachments: {},
+        },
+        options: [
+            CommandDataOption {
+                name: "test",
+                value: Autocomplete {
+                    kind: String,
+                    value: "never",
+                },
+            },
+        ],
+        guild_id: None,
+        target_id: None,
+    },
+    guild_id: Some(
+        GuildId(
+            InnerId(
+                1271900062502486137,
+            ),
+        ),
+    ),
+    channel: Some(
+        PartialChannel {
+            id: ChannelId(
+                InnerId(
+                    1314610306500268032,
+                ),
+            ),
+            name: Some(
+                "magician-testing",
+            ),
+            kind: Text,
+            permissions: Some(
+                Permissions(
+                    2111062325329919,
+                ),
+            ),
+            thread_metadata: None,
+            parent_id: Some(
+                ChannelId(
+                    InnerId(
+                        1314610123188211803,
+                    ),
+                ),
+            ),
+        },
+    ),
+    channel_id: ChannelId(
+        InnerId(
+            1314610306500268032,
+        ),
+    ),
+    member: Some(
+        Member {
+            user: User {
+                id: UserId(
+                    InnerId(
+                        394212669114286090,
+                    ),
+                ),
+                name: "thepolishtech",
+                discriminator: None,
+                global_name: Some(
+                    "ThePolishTech",
+                ),
+                avatar: Some(
+                    "cb1f3a2da2e069b591721ceebbd0b7e6",
+                ),
+                bot: false,
+                system: false,
+                mfa_enabled: false,
+                banner: None,
+                accent_colour: None,
+                locale: None,
+                verified: None,
+                email: None,
+                flags: UserPublicFlags(
+                    0,
+                ),
+                premium_type: None,
+                public_flags: Some(
+                    UserPublicFlags(
+                        4194560,
+                    ),
+                ),
+                member: None,
+            },
+            nick: None,
+            avatar: None,
+            roles: [
+                RoleId(
+                    InnerId(
+                        1272516068791025794,
+                    ),
+                ),
+            ],
+            joined_at: Some(
+                Timestamp(
+                    2024-08-10T18:36:46.293Z,
+                ),
+            ),
+            premium_since: None,
+            deaf: false,
+            mute: false,
+            flags: GuildMemberFlags(
+                0,
+            ),
+            pending: false,
+            permissions: Some(
+                Permissions(
+                    2111062325329919,
+                ),
+            ),
+            communication_disabled_until: None,
+            guild_id: GuildId(
+                InnerId(
+                    1271900062502486137,
+                ),
+            ),
+            unusual_dm_activity_until: None,
+        },
+    ),
+    user: User {
+        id: UserId(
+            InnerId(
+                394212669114286090,
+            ),
+        ),
+        name: "thepolishtech",
+        discriminator: None,
+        global_name: Some(
+            "ThePolishTech",
+        ),
+        avatar: Some(
+            "cb1f3a2da2e069b591721ceebbd0b7e6",
+        ),
+        bot: false,
+        system: false,
+        mfa_enabled: false,
+        banner: None,
+        accent_colour: None,
+        locale: None,
+        verified: None,
+        email: None,
+        flags: UserPublicFlags(
+            0,
+        ),
+        premium_type: None,
+        public_flags: Some(
+            UserPublicFlags(
+                4194560,
+            ),
+        ),
+        member: None,
+    },
+    token: "aW50ZXJhY3Rpb246MTMzODE3MTEzMjA0MTIzMjQwNTpxV3VYVDQwTFp6NFBWcUMyZGVRb0M3M0MyUFlEcnZqQ25kS01oajZNNkh1NkRmbXptU09NNzlSVkRBSENkZlJEV1ZPR1djSkpvWlhWM1JqbDYwSEZWU0hWYjB1OWg5dlM4MVgwdzZYU2Vtc0FCMWcxaDNPS1BsZGhGeUtxc21iMg",
+    version: 1,
+    app_permissions: Some(
+        Permissions(
+            2107735977479745,
+        ),
+    ),
+    locale: "en-GB",
+    guild_locale: Some(
+        "en-US",
+    ),
+    entitlements: [],
+    authorizing_integration_owners: AuthorizingIntegrationOwners(
+        [
+            GuildInstall(
+                Some(
+                    GuildId(
+                        InnerId(
+                            1271900062502486137,
+                        ),
+                    ),
+                ),
+            ),
+        ],
+    ),
+    context: Some(
+        Guild,
+    ),
+}
+CommandInteraction {
+    id: InteractionId(
+        InnerId(
+            1338171135539417158,
+        ),
+    ),
+    application_id: ApplicationId(
+        InnerId(
+            1307619903909662750,
+        ),
+    ),
+    data: CommandData {
+        id: CommandId(
+            InnerId(
+                1329712081506795531,
+            ),
+        ),
+        name: "tmp",
+        kind: ChatInput,
+        resolved: CommandDataResolved {
+            users: {},
+            members: {},
+            roles: {},
+            channels: {},
+            messages: {},
+            attachments: {},
+        },
+        options: [
+            CommandDataOption {
+                name: "test",
+                value: Autocomplete {
+                    kind: String,
+                    value: "never",
+                },
+            },
+        ],
+        guild_id: None,
+        target_id: None,
+    },
+    guild_id: Some(
+        GuildId(
+            InnerId(
+                1271900062502486137,
+            ),
+        ),
+    ),
+    channel: Some(
+        PartialChannel {
+            id: ChannelId(
+                InnerId(
+                    1314610306500268032,
+                ),
+            ),
+            name: Some(
+                "magician-testing",
+            ),
+            kind: Text,
+            permissions: Some(
+                Permissions(
+                    2111062325329919,
+                ),
+            ),
+            thread_metadata: None,
+            parent_id: Some(
+                ChannelId(
+                    InnerId(
+                        1314610123188211803,
+                    ),
+                ),
+            ),
+        },
+    ),
+    channel_id: ChannelId(
+        InnerId(
+            1314610306500268032,
+        ),
+    ),
+    member: Some(
+        Member {
+            user: User {
+                id: UserId(
+                    InnerId(
+                        394212669114286090,
+                    ),
+                ),
+                name: "thepolishtech",
+                discriminator: None,
+                global_name: Some(
+                    "ThePolishTech",
+                ),
+                avatar: Some(
+                    "cb1f3a2da2e069b591721ceebbd0b7e6",
+                ),
+                bot: false,
+                system: false,
+                mfa_enabled: false,
+                banner: None,
+                accent_colour: None,
+                locale: None,
+                verified: None,
+                email: None,
+                flags: UserPublicFlags(
+                    0,
+                ),
+                premium_type: None,
+                public_flags: Some(
+                    UserPublicFlags(
+                        4194560,
+                    ),
+                ),
+                member: None,
+            },
+            nick: None,
+            avatar: None,
+            roles: [
+                RoleId(
+                    InnerId(
+                        1272516068791025794,
+                    ),
+                ),
+            ],
+            joined_at: Some(
+                Timestamp(
+                    2024-08-10T18:36:46.293Z,
+                ),
+            ),
+            premium_since: None,
+            deaf: false,
+            mute: false,
+            flags: GuildMemberFlags(
+                0,
+            ),
+            pending: false,
+            permissions: Some(
+                Permissions(
+                    2111062325329919,
+                ),
+            ),
+            communication_disabled_until: None,
+            guild_id: GuildId(
+                InnerId(
+                    1271900062502486137,
+                ),
+            ),
+            unusual_dm_activity_until: None,
+        },
+    ),
+    user: User {
+        id: UserId(
+            InnerId(
+                394212669114286090,
+            ),
+        ),
+        name: "thepolishtech",
+        discriminator: None,
+        global_name: Some(
+            "ThePolishTech",
+        ),
+        avatar: Some(
+            "cb1f3a2da2e069b591721ceebbd0b7e6",
+        ),
+        bot: false,
+        system: false,
+        mfa_enabled: false,
+        banner: None,
+        accent_colour: None,
+        locale: None,
+        verified: None,
+        email: None,
+        flags: UserPublicFlags(
+            0,
+        ),
+        premium_type: None,
+        public_flags: Some(
+            UserPublicFlags(
+                4194560,
+            ),
+        ),
+        member: None,
+    },
+    token: "aW50ZXJhY3Rpb246MTMzODE3MTEzNTUzOTQxNzE1ODpIREk4ZFRJd0xsdWwyUTZXeFpkSHYwTG03bjFUYVg5ZU5GTVlXcDdBR1Y4NXJ5Qk5sZ1NoYWlJQ2xMcEVrdEFOZlZHdlBDRThOREZlT3BYdkNSQ01ZcWtxYUlqc0VuSGZvSVVXb0dXUjRjbDQzejg1QTZJQm54VXNxREdOdzY2SQ",
+    version: 1,
+    app_permissions: Some(
+        Permissions(
+            2107735977479745,
+        ),
+    ),
+    locale: "en-GB",
+    guild_locale: Some(
+        "en-US",
+    ),
+    entitlements: [],
+    authorizing_integration_owners: AuthorizingIntegrationOwners(
+        [
+            GuildInstall(
+                Some(
+                    GuildId(
+                        InnerId(
+                            1271900062502486137,
+                        ),
+                    ),
+                ),
+            ),
+        ],
+    ),
+    context: Some(
+        Guild,
+    ),
+}
+CommandInteraction {
+    id: InteractionId(
+        InnerId(
+            1338171140908257352,
+        ),
+    ),
+    application_id: ApplicationId(
+        InnerId(
+            1307619903909662750,
+        ),
+    ),
+    data: CommandData {
+        id: CommandId(
+            InnerId(
+                1329712081506795531,
+            ),
+        ),
+        name: "tmp",
+        kind: ChatInput,
+        resolved: CommandDataResolved {
+            users: {},
+            members: {},
+            roles: {},
+            channels: {},
+            messages: {},
+            attachments: {},
+        },
+        options: [
+            CommandDataOption {
+                name: "test",
+                value: Autocomplete {
+                    kind: String,
+                    value: "never",
+                },
+            },
+        ],
+        guild_id: None,
+        target_id: None,
+    },
+    guild_id: Some(
+        GuildId(
+            InnerId(
+                1271900062502486137,
+            ),
+        ),
+    ),
+    channel: Some(
+        PartialChannel {
+            id: ChannelId(
+                InnerId(
+                    1314610306500268032,
+                ),
+            ),
+            name: Some(
+                "magician-testing",
+            ),
+            kind: Text,
+            permissions: Some(
+                Permissions(
+                    2111062325329919,
+                ),
+            ),
+            thread_metadata: None,
+            parent_id: Some(
+                ChannelId(
+                    InnerId(
+                        1314610123188211803,
+                    ),
+                ),
+            ),
+        },
+    ),
+    channel_id: ChannelId(
+        InnerId(
+            1314610306500268032,
+        ),
+    ),
+    member: Some(
+        Member {
+            user: User {
+                id: UserId(
+                    InnerId(
+                        394212669114286090,
+                    ),
+                ),
+                name: "thepolishtech",
+                discriminator: None,
+                global_name: Some(
+                    "ThePolishTech",
+                ),
+                avatar: Some(
+                    "cb1f3a2da2e069b591721ceebbd0b7e6",
+                ),
+                bot: false,
+                system: false,
+                mfa_enabled: false,
+                banner: None,
+                accent_colour: None,
+                locale: None,
+                verified: None,
+                email: None,
+                flags: UserPublicFlags(
+                    0,
+                ),
+                premium_type: None,
+                public_flags: Some(
+                    UserPublicFlags(
+                        4194560,
+                    ),
+                ),
+                member: None,
+            },
+            nick: None,
+            avatar: None,
+            roles: [
+                RoleId(
+                    InnerId(
+                        1272516068791025794,
+                    ),
+                ),
+            ],
+            joined_at: Some(
+                Timestamp(
+                    2024-08-10T18:36:46.293Z,
+                ),
+            ),
+            premium_since: None,
+            deaf: false,
+            mute: false,
+            flags: GuildMemberFlags(
+                0,
+            ),
+            pending: false,
+            permissions: Some(
+                Permissions(
+                    2111062325329919,
+                ),
+            ),
+            communication_disabled_until: None,
+            guild_id: GuildId(
+                InnerId(
+                    1271900062502486137,
+                ),
+            ),
+            unusual_dm_activity_until: None,
+        },
+    ),
+    user: User {
+        id: UserId(
+            InnerId(
+                394212669114286090,
+            ),
+        ),
+        name: "thepolishtech",
+        discriminator: None,
+        global_name: Some(
+            "ThePolishTech",
+        ),
+        avatar: Some(
+            "cb1f3a2da2e069b591721ceebbd0b7e6",
+        ),
+        bot: false,
+        system: false,
+        mfa_enabled: false,
+        banner: None,
+        accent_colour: None,
+        locale: None,
+        verified: None,
+        email: None,
+        flags: UserPublicFlags(
+            0,
+        ),
+        premium_type: None,
+        public_flags: Some(
+            UserPublicFlags(
+                4194560,
+            ),
+        ),
+        member: None,
+    },
+    token: "aW50ZXJhY3Rpb246MTMzODE3MTE0MDkwODI1NzM1MjpkMEE0VDJsOE1IS1VrTmtNWUhTU2NlZzRuUGs2MEFkS2VjYmdaYXhQb0c1S0cyaEV3aE5vVzZCQWZuNjk5eE1KaFFPMjBYMlA0d2JmWlRBb2lzVzZJUzVHY0J6bWxwZ3F2R3NxWkdUMkg5WkFVNUs4dHY5Ykdjd29yMWFIcXFUbg",
+    version: 1,
+    app_permissions: Some(
+        Permissions(
+            2107735977479745,
+        ),
+    ),
+    locale: "en-GB",
+    guild_locale: Some(
+        "en-US",
+    ),
+    entitlements: [],
+    authorizing_integration_owners: AuthorizingIntegrationOwners(
+        [
+            GuildInstall(
+                Some(
+                    GuildId(
+                        InnerId(
+                            1271900062502486137,
+                        ),
+                    ),
+                ),
+            ),
+        ],
+    ),
+    context: Some(
+        Guild,
+    ),
+}
