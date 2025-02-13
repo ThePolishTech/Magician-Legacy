@@ -67,6 +67,7 @@ impl EventHandler for Handler {
             let slash_commands = vec![
                 commands::register::build(),
                 commands::deregister::build(),
+                commands::build_character::build(),
                 commands::tmp::build()
             ];
 
@@ -83,38 +84,104 @@ impl EventHandler for Handler {
         // Here we see *what* kind of interaction we recived. Based upon that we de what we can and
         // can't do.
         match interaction_data {
-            Interaction::Command( inbound_command_data ) => {
-
-                // Depending on which command was called, execute the right code. We expect a
-                // return type of Option<CreateInteractionRespone> after .await'ing. Theoretically
-                // we could use a Result<T, E> enum to log errors, but I've decided that it would
-                // be better to handle that inside of the function to not force a structure upon
-                // ourseleves. Besdies, we could respond to the interaction inside of the function,
-                // therefore not doing anything more here would be optimal.
-                let response_opt = match inbound_command_data.data.name.clone().as_str() {
-                    "register" => { commands::register::run( &inbound_command_data, &ctx ).await },
-                    "deregister" => { commands::deregister::run( &inbound_command_data, &ctx).await },
-                    "tmp" => { commands::tmp::run( &inbound_command_data, &ctx).await } 
-                    _ => { None }
-                };
-
-                if let Some( response ) = response_opt {
-                    // If there is a response message given to us, atempt to send it as a response
-                    // to the interaction. If that fails, log it.
-                    // Although not being a fatal error, not responding to an interaction is still
-                    // unwanted as the user may be missing out on important information
-                    if let Err( why ) = inbound_command_data.create_response( &ctx.http, response ).await {
-                        println!( "{}", create_log_message(
-                                format!("Failed to send response to command interaction:\n\t{why}").as_str(), LogLevel::Error
-                        ))
-                    }
-                }
-
                 
-            },
-            // Other Stuff will go here. Autocomplete is something I plan to eventually implement 
-            Interaction::Autocomplete( autocomplete_data ) => commands::tmp::handle_autocomplete( &autocomplete_data, &ctx ).await,
-            _ => {}
+            // --== COMMAND INTERACTIONS ==-- //
+                
+                Interaction::Command( inbound_command_data ) => {
+
+                    // Depending on which command was called, execute the right code. We expect a
+                    // return type of Option<CreateInteractionRespone> after .await'ing. Theoretically
+                    // we could use a Result<T, E> enum to log errors, but I've decided that it would
+                    // be better to handle that inside of the function to not force a structure upon
+                    // ourseleves. Besdies, we could respond to the interaction inside of the function,
+                    // therefore not doing anything more here would be optimal.
+                    let response_opt = match inbound_command_data.data.name.clone().as_str() {
+                        "register" => { commands::register::run( &inbound_command_data, &ctx ).await },
+                        "deregister" => { commands::deregister::run( &inbound_command_data, &ctx).await },
+                        "tmp" => { commands::tmp::run( &inbound_command_data, &ctx).await },
+                        "build_character" => { commands::build_character::run(&inbound_command_data, &ctx).await }
+                        _ => { None }
+                    };
+
+                    if let Some( response ) = response_opt {
+                        // If there is a response message given to us, atempt to send it as a response
+                        // to the interaction. If that fails, log it.
+                        // Although not being a fatal error, not responding to an interaction is still
+                        // unwanted as the user may be missing out on important information
+                        if let Err( why ) = inbound_command_data.create_response( &ctx.http, response ).await {
+                            println!( "{}", create_log_message(
+                                    format!("Failed to send response to command interaction:\n\t{why}").as_str(), LogLevel::Error
+                            ))
+                        }
+                    }
+
+                    
+                },
+            // ==--
+
+            // --== AUTOCOMPLETE INTERACTIONS ==-- //
+            
+                Interaction::Autocomplete( inbound_autocomplete_data ) => {
+                    let interaction_name = inbound_autocomplete_data.data.name.clone();
+
+                    match interaction_name.as_str() {
+                        "tmp" => { commands::tmp::handle_autocomplete( &inbound_autocomplete_data, &ctx ).await },
+                        _ => {
+                            println!( "{}", create_log_message(
+                                    format!("Recived unknown autocomplete interaction. Name: {interaction_name}").as_str(),
+                                    LogLevel::Warning
+                            ))
+                        }
+                    }
+                },
+            // ==--
+
+            // --== MODAL INTERACTIONS ==-- //
+                
+                Interaction::Modal( inbound_modal_data ) => {
+                    let modal_id: String = inbound_modal_data.data.custom_id.clone();
+                    let modal_id_components = modal_id
+                        .split(':')
+                        .collect::<Vec<&str>>();
+
+                    // If the ID of the modal is mangled, i.e. doesn't contain a ':' character to
+                    // seperate the name of the interaction that called it, we will print the
+                    // mangled ID to the terminal in an error message and then break as we can't do
+                    // anything more with it unfortunetly
+                    let modal_name = modal_id_components.first();
+                    if modal_name.is_none() {
+                        println!( "{}", create_log_message(
+                                format!("Recived modal interaction with mangled id: {}", modal_id ).as_str(),
+                                LogLevel::Warning
+                        ));
+                        // If the ID is mangled, we can't do anything with it so we will just break
+                        // early
+                        return;
+                    }
+                    let modal_name = modal_name
+                        .expect("Handled None case already")
+                        .to_owned();  // Looks better if we later match on a new String than a
+                                      // &&str
+
+                    match modal_name {
+                        "build_character" => commands::build_character::handle_modal( &inbound_modal_data, &ctx ).await,
+                        _ => {
+                            println!( "{}", create_log_message(
+                                format!("Recived unknown modal interaction. Name: {}", modal_name ).as_str(),
+                                LogLevel::Warning
+                            ));
+
+                        }
+                    };
+                },
+            // ==--
+
+            _ => {
+                println!( "{}", create_log_message(
+                        format!("Recived unknown interaction: {:?}", interaction_data.kind() ).as_str(),
+                        LogLevel::Warning
+                ))
+            }
         }
     }
 
