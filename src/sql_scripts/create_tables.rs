@@ -11,7 +11,7 @@ pub const SCRIPT: &str = "
 
     CREATE TABLE  IF NOT EXISTS    Characters
     (
-        pk_CharacterId    INTEGER  PRIMARY KEY,
+        pk_characterId    INTEGER  PRIMARY KEY,
         fk_discordId      INTEGER  NOT NULL,
         name              TEXT     NOT NULL,
         species           TEXT     NOT NULL,
