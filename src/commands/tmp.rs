@@ -1,17 +1,11 @@
-use std::any::Any;
-
 use serenity::{
     all::{AutocompleteChoice, CommandOptionType, CreateAutocompleteResponse, CreateCommandOption, CreateInteractionResponse}, builder::{
-        CreateAttachment, CreateCommand, CreateEmbed, CreateInteractionResponseMessage
+        CreateCommand, CreateInteractionResponseMessage
     }, client::Context, model::application::CommandInteraction
 };
 use crate::utils::{
     create_log_message, LogLevel,
-    DatabaseConnectionContainer,
-    EmbedColours
 };
-use toml::Table;
-use crate::sql_scripts::discord_users;
 
 pub fn build() -> CreateCommand {
     CreateCommand::new("tmp")

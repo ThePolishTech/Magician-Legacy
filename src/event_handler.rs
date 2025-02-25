@@ -5,22 +5,28 @@ use crate::utils::{
 };
 
 use serenity::{
-     all::{Interaction}, async_trait, builder::{
+     all::Interaction,
+     async_trait,
+     builder::{
         CreateEmbed, CreateMessage
-    }, client::{
+     },
+     client::{
         Context, EventHandler
-    }, model::{
+     },
+     model::{
         application::Command, gateway::Ready, id::ChannelId, Timestamp
-    }
+     }
 };
 
 use crate::commands;
 
 
-pub struct Handler;
+pub struct DiscordBot {
+    pub database_connection: sqlx::SqlitePool
+}
 
 #[async_trait]
-impl EventHandler for Handler {
+impl EventHandler for DiscordBot {
     
     async fn ready( &self, ctx: Context, _ready: Ready ) {
 
@@ -96,10 +102,23 @@ impl EventHandler for Handler {
                     // ourseleves. Besdies, we could respond to the interaction inside of the function,
                     // therefore not doing anything more here would be optimal.
                     let response_opt = match inbound_command_data.data.name.clone().as_str() {
-                        "register" => { commands::register::run( &inbound_command_data, &ctx ).await },
-                        "deregister" => { commands::deregister::run( &inbound_command_data, &ctx).await },
-                        "tmp" => { commands::tmp::run( &inbound_command_data, &ctx).await },
-                        "build_character" => { commands::build_character::run(&inbound_command_data, &ctx).await }
+
+                        "register" => commands::register::run(
+                                &inbound_command_data, &ctx, &self
+                        ).await,
+
+                        "deregister" => commands::deregister::run(
+                                &inbound_command_data, &ctx, &self
+                        ).await,
+
+                        "tmp" => commands::tmp::run(
+                                &inbound_command_data, &ctx
+                        ).await,
+
+                        "build_character" => commands::build_character::run(
+                                &inbound_command_data, &ctx
+                        ).await,
+
                         _ => { None }
                     };
 
@@ -187,5 +206,3 @@ impl EventHandler for Handler {
 
 }
 
-// some comment
-// for showcase

@@ -1,20 +1,18 @@
 // xxxxxxxxxxxxxxxxx //
 // --== CRATES == -- //
 // xxxxxxxxxxxxxxxxx //
-use std::{
-    env,
-    sync::{Arc,Mutex}
-};
+use std::env;
 
 use serenity::{
-    model::gateway::GatewayIntents, Client
+    model::gateway::GatewayIntents,
+    Client
 };
+use sqlx::{sqlite::SqliteConnectOptions, SqlitePool};
 
 mod sql_scripts;
 mod event_handler;
 mod commands;
 mod utils;
-use utils::DatabaseConnectionContainer;
 
 
 // xxxxxxxxxxxxxx //
@@ -25,12 +23,19 @@ async fn main() {
 
     println!( "{}", utils::TITLE );
 
-    let bot_client: Result< (serenity::Client, rusqlite::Connection), i32 > = 'main: {
+    let bot_client: Result< serenity::Client, i32 > = 'main: {
 
         // --== LOAD/CREATE DATABASE ==-- //
 
             print!("Opening Connection to Database...");
-            let rusqlite_connection = match rusqlite::Connection::open("kermmaw_db") {
+            let sqlite_connection_options = SqliteConnectOptions::new()
+                .filename("kermmaw_db")
+                .create_if_missing(true);
+
+            let database_connection = SqlitePool::connect_with(sqlite_connection_options).await;
+
+            
+            let sqlx_connection = match database_connection {
                 Ok(conn) => {
                     println!("Ok");
                     conn
@@ -40,17 +45,23 @@ async fn main() {
                     break 'main Err( 1 );
                 }
             };
+        // ==--
+
+        // --== RUN MIGRATION INIT SCRIPT ==-- //
 
             print!("Running Table Creation Script...");
-            match rusqlite_connection.execute_batch( sql_scripts::create_tables::SCRIPT ) {
-                Ok(_) => {
+            let migration = sqlx::migrate!("./migrations")
+                .run(&sqlx_connection);
+
+            match migration.await {
+                Ok(()) => {
                     println!("Ok")
                 },
                 Err(why) => {
                     println!("Error: {why}");
                     break 'main Err( 1 );
                 }
-            }
+            };
         // ==--
 
         // --== READ BOT TOKEN FROM ENVIROMENT ==-- //
@@ -75,10 +86,15 @@ async fn main() {
                 | GatewayIntents::GUILD_MESSAGE_REACTIONS;
 
             print!("Building Client...");
-            match Client::builder( bot_token, gateway_intents ).event_handler(event_handler::Handler).await {
+
+            let client = event_handler::DiscordBot {
+                database_connection: sqlx_connection
+            };
+
+            match Client::builder( bot_token, gateway_intents ).event_handler(client).await {
                 Ok(client_builder) => {
                     println!("Ok");
-                    break 'main Ok( (client_builder, rusqlite_connection) )
+                    break 'main Ok( client_builder )
                 },
                 Err(why) => {
                     println!("Error: {}", why);
@@ -92,13 +108,9 @@ async fn main() {
         
         print!("Starting Client...");
         match bot_client {
-            Ok( (mut client, rusqlite_connection) ) => {
+            Ok( mut client ) => {
                 println!("Ok\n");
 
-                // Pass database connection into client's data
-                let data = client.data.write();
-                data.await.insert::<DatabaseConnectionContainer>(Arc::new( Mutex::new( rusqlite_connection ) ));
-                
                 // Start the client
                 let _ = client.start().await;
             },

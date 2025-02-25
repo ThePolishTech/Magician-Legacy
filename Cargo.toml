@@ -6,7 +6,7 @@ edition = "2021"
 [dependencies]
 chrono   = " 0.4.38 "
 serenity = " 0.12.4 "
-rusqlite = " 0.32.1 "
+sqlx     = { version = "0.8.3",  features = ["runtime-tokio-rustls", "sqlite"] }
 tokio    = { version = "1.41.1", features = ["macros", "rt-multi-thread"] }
 toml     = "0.8.19"
 

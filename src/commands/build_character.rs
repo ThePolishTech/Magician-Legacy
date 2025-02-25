@@ -1,15 +1,13 @@
-use std::{any::Any, borrow::BorrowMut};
-
+#[allow(unused_imports)]
 use serenity::{
-    all::{ActionRow, ActionRowComponent, CreateActionRow, CreateInputText, CreateModal, CreateSelectMenu, CreateSelectMenuOption, InputText, InputTextStyle, ModalInteraction}, builder::{
+    all::{
+        ActionRowComponent, CreateActionRow, CreateInputText,
+        CreateModal, CreateSelectMenu, CreateSelectMenuOption, InputText, InputTextStyle, ModalInteraction}, builder::{
         CreateCommand, CreateEmbed,
         CreateInteractionResponse,
         CreateInteractionResponseMessage,
     }, client::Context, model::application::CommandInteraction
 };
-use crate::{sql_scripts::characters, utils::{
-    create_log_message, DatabaseConnectionContainer, EmbedColours, LogLevel
-}};
 
 
 
@@ -42,7 +40,7 @@ pub async fn run( interaction_data: &CommandInteraction, ctx: &Context ) -> Opti
 }
 
 // After a user submits the modal, we need to parse the incoming data
-pub async fn handle_modal( interaction_data: &ModalInteraction, ctx: &Context ) {
+pub async fn handle_modal( interaction_data: &ModalInteraction, _ctx: &Context ) {
     
     // We don't have to worry about out-of-bounds here, as we know the inbound modal will have 3
     // components, that being the character's name, species, and backstory
