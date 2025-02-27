@@ -129,7 +129,8 @@ impl EventHandler for DiscordBot {
                         // unwanted as the user may be missing out on important information
                         if let Err( why ) = inbound_command_data.create_response( &ctx.http, response ).await {
                             println!( "{}", create_log_message(
-                                    format!("Failed to send response to command interaction:\n\t{why}").as_str(), LogLevel::Error
+                                    format!("Failed to send response to command interaction:\n\t{why}").as_str(),
+                                    LogLevel::Error
                             ))
                         }
                     }
@@ -183,7 +184,9 @@ impl EventHandler for DiscordBot {
                                       // &&str
 
                     match modal_name {
-                        "build_character" => commands::build_character::handle_modal( &inbound_modal_data, &ctx ).await,
+                        "build_character" => commands::build_character::handle_modal(
+                                &inbound_modal_data, &ctx, self
+                        ).await,
                         _ => {
                             println!( "{}", create_log_message(
                                 format!("Recived unknown modal interaction. Name: {}", modal_name ).as_str(),

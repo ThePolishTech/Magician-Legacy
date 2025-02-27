@@ -1,19 +1,19 @@
 CREATE TABLE  IF NOT EXISTS    DiscordUsers
 (
     pk_discordId           INTEGER  PRIMARY KEY,
-    fk_currentCharacter    INTEGER, -- Can't be NOT NULL due to first registration edge case
+    fk_currentCharacter    INTEGER, -- Can be NOT NULL due to first registration edge case
 
     FOREIGN KEY (fk_currentCharacter)
-    REFERENCES Characters (pk_CharacterId)
+    REFERENCES Characters (pk_characterId)
 );
 
 CREATE TABLE  IF NOT EXISTS    Characters
 (
     pk_characterId    INTEGER  PRIMARY KEY,
     fk_discordId      INTEGER  NOT NULL,
-    name              TEXT     NOT NULL,
-    species           TEXT     NOT NULL,
-    backstory         TEXT     NOT NULL,
+    pk_name           TEXT     NOT NULL,  -- Will be manually enforced in code as a FOREIGN
+    species           TEXT     NOT NULL,     -- KEY can't reference only part of a composite
+    backstory         TEXT     NOT NULL,     -- PRIMARY KEY
 
     FOREIGN KEY (fk_discordId)
     REFERENCES DiscordUsers (pk_discordId)

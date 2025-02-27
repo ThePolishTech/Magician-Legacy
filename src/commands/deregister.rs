@@ -10,9 +10,13 @@ use serenity::{
     model::application::CommandInteraction,
     futures::StreamExt
 };
+use sqlx::query;
 use crate::{
     event_handler,
-    sql_scripts::discord_users,
+    sql_scripts::{
+        discord_users,
+        characters
+    },
     utils::{
         create_log_message, EmbedColours, LogLevel
     }
@@ -38,8 +42,9 @@ pub fn build() -> CreateCommand {
 
 pub async fn run( interaction_data: &CommandInteraction, ctx: &Context, discord_bot: &event_handler::DiscordBot ) -> Option<CreateInteractionResponse> {
 
-    // We'll be using the user's ID quite often, so lets just save it here for future use
-    let invoking_user_id = interaction_data.user.id.get();
+    // We'll be using the user's ID and Tag quite often, so lets just save it here for future use
+    let invoking_user_id  = interaction_data.user.id.get();
+    let invoking_user_tag = interaction_data.user.tag();
 
     // Because we'll be doing plenty of SQLite queries, even if theoretically and practically those
     // won't take long, I personally think it's a good idea to first aknowlage the user's command 
@@ -78,7 +83,39 @@ pub async fn run( interaction_data: &CommandInteraction, ctx: &Context, discord_
                     .colour(EmbedColours::ERROR)
             }
         // ==--
+        
+        // --== CHARACTERS TEST ==-- //
 
+            // Another thing we need to make sure of, is that the user doesn't have any characters
+            // that have not yet been removed
+            let query_result = sqlx::query( characters::SELECT_BY_OWNER_ID )
+                .bind( invoking_user_id as i64 )
+                .fetch_all( &discord_bot.database_connection )
+                .await;
+
+            match query_result {
+                Ok(data) => {
+                    if !data.is_empty() {
+                        break 'return_embed CreateEmbed::new()
+                            .title("Can't remove you")
+                            .description("You have character(s) in the database. We cannot remove your profile while they're there")
+                            .colour(EmbedColours::ERROR)
+                    }
+                },
+                Err( why ) => {
+                    // For some reason, our query has failed. Lets log the error and prepare an info
+                    // error to our user
+                    println!("{}", create_log_message(
+                            format!("Failed to remove {invoking_user_tag}'s profile: \n\t{why}").as_str(),
+                            LogLevel::Error
+                    ));
+
+                    break 'return_embed CreateEmbed::new()
+                        .title("A unexpected error occured")
+                        .description("If it persists, feel free to open an issue on the bot's github page")
+                }
+            }
+        // ==--
 
         // If we haven't broken out of this block upto this point, it means that all tests have
         // passed. We can now move forward with removing the invoking user's database entry
@@ -88,8 +125,6 @@ pub async fn run( interaction_data: &CommandInteraction, ctx: &Context, discord_
             .await;
 
         
-        let invoking_user_tag = interaction_data.user.tag();  // We'll need the invoking user's tag
-                                                              // for loging reasons later
         match query_result {
             Ok(_) => {  // We'll ignore the count of rows detected
                 
