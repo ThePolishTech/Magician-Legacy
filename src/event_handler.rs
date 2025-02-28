@@ -79,7 +79,7 @@ impl EventHandler for DiscordBot {
 
             if let Err( why ) = Command::set_global_commands( &ctx.http, slash_commands ).await {
                 println!( "{}",
-                    create_log_message( format!("Failed to register slash commands:\n\t{why}").as_str(), LogLevel::Fatal )
+                    create_log_message( format!("Failed to register slash commands:\n\t{why}"), LogLevel::Fatal )
                 )
             }
         // ==--
@@ -129,7 +129,7 @@ impl EventHandler for DiscordBot {
                         // unwanted as the user may be missing out on important information
                         if let Err( why ) = inbound_command_data.create_response( &ctx.http, response ).await {
                             println!( "{}", create_log_message(
-                                    format!("Failed to send response to command interaction:\n\t{why}").as_str(),
+                                    format!("Failed to send response to command interaction:\n\t{why}"),
                                     LogLevel::Error
                             ))
                         }
@@ -148,7 +148,7 @@ impl EventHandler for DiscordBot {
                         "tmp" => { commands::tmp::handle_autocomplete( &inbound_autocomplete_data, &ctx ).await },
                         _ => {
                             println!( "{}", create_log_message(
-                                    format!("Recived unknown autocomplete interaction. Name: {interaction_name}").as_str(),
+                                    format!("Recived unknown autocomplete interaction. Name: {interaction_name}"),
                                     LogLevel::Warning
                             ))
                         }
@@ -171,7 +171,7 @@ impl EventHandler for DiscordBot {
                     let modal_name = modal_id_components.first();
                     if modal_name.is_none() {
                         println!( "{}", create_log_message(
-                                format!("Recived modal interaction with mangled id: {}", modal_id ).as_str(),
+                                format!("Recived modal interaction with mangled id: {}", modal_id ),
                                 LogLevel::Warning
                         ));
                         // If the ID is mangled, we can't do anything with it so we will just break
@@ -189,7 +189,7 @@ impl EventHandler for DiscordBot {
                         ).await,
                         _ => {
                             println!( "{}", create_log_message(
-                                format!("Recived unknown modal interaction. Name: {}", modal_name ).as_str(),
+                                format!("Recived unknown modal interaction. Name: {}", modal_name ),
                                 LogLevel::Warning
                             ));
 
@@ -200,7 +200,7 @@ impl EventHandler for DiscordBot {
 
             _ => {
                 println!( "{}", create_log_message(
-                        format!("Recived unknown interaction: {:?}", interaction_data.kind() ).as_str(),
+                        format!("Recived unknown interaction: {:?}", interaction_data.kind() ),
                         LogLevel::Warning
                 ))
             }

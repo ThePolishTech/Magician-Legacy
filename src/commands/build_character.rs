@@ -149,7 +149,7 @@ pub async fn handle_modal( interaction_data: &ModalInteraction, ctx: &Context, d
     // Send the payload, report to Stdout if an error occurs
     if let Err( why ) = send_message_payload.await {
         println!("{}", create_log_message(
-                format!("Failed to send response in /register:\n\t{}", why ).as_str(),
+                format!("Failed to send response in /register:\n\t{}", why ),
                 LogLevel::Warning
         ))
     }

@@ -48,7 +48,7 @@ pub async fn handle_autocomplete( interaction_data: &CommandInteraction, ctx: &C
 
     if let Err( why ) = send_response_payload.await {
         println!("{}", create_log_message(
-                format!("Failed to send autocomplete response in /tmp:\n\t{}",why).as_str(),
+                format!("Failed to send autocomplete response in /tmp:\n\t{}",why),
                 LogLevel::Warning
         ))
     }

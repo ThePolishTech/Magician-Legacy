@@ -53,7 +53,7 @@ pub async fn run( interaction_data: &CommandInteraction, ctx: &Context, discord_
                 // We managed to enter the user into our database! Let's log it to console and
                 // notify them
                 println!("{}", create_log_message(
-                        format!("Added {invoking_user_tag}'s profile").as_str(),
+                        format!("Added {invoking_user_tag}'s profile"),
                         LogLevel::Info
                 ));
 
@@ -89,7 +89,7 @@ pub async fn run( interaction_data: &CommandInteraction, ctx: &Context, discord_
                 // If We got to this point, it means we have encountered a different error than
                 // 1555, we need to respond with a error message
                 println!("{}", create_log_message(
-                        format!("Failed to add {invoking_user_tag}'s profile to the database:\n\t{why}").as_str(),
+                        format!("Failed to add {invoking_user_tag}'s profile to the database:\n\t{why}"),
                         LogLevel::Warning
                 ));
 
@@ -111,7 +111,7 @@ pub async fn run( interaction_data: &CommandInteraction, ctx: &Context, discord_
     // Send the payload, report to Stdout if an error occurs
     if let Err( why ) = send_message_payload.await {
         println!("{}", create_log_message(
-                format!("Failed to send response in /register:\n\t{}", why ).as_str(),
+                format!("Failed to send response in /register:\n\t{}", why ),
                 LogLevel::Warning
         ))
     }

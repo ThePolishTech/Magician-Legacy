@@ -106,7 +106,7 @@ pub async fn run( interaction_data: &CommandInteraction, ctx: &Context, discord_
                     // For some reason, our query has failed. Lets log the error and prepare an info
                     // error to our user
                     println!("{}", create_log_message(
-                            format!("Failed to remove {invoking_user_tag}'s profile: \n\t{why}").as_str(),
+                            format!("Failed to remove {invoking_user_tag}'s profile: \n\t{why}"),
                             LogLevel::Error
                     ));
 
@@ -130,7 +130,7 @@ pub async fn run( interaction_data: &CommandInteraction, ctx: &Context, discord_
                 
                 // Succeeding, we notify both stdout, and the user
                 println!("{}", create_log_message(
-                        format!("Removed {invoking_user_tag}'s profile").as_str(),
+                        format!("Removed {invoking_user_tag}'s profile"),
                         LogLevel::Info
                 ));
 
@@ -143,7 +143,7 @@ pub async fn run( interaction_data: &CommandInteraction, ctx: &Context, discord_
                 // For some reason, our query has failed. Lets log the error and prepare an info
                 // error to our user
                 println!("{}", create_log_message(
-                        format!("Failed to remove {invoking_user_tag}'s profile: \n\t{why}").as_str(),
+                        format!("Failed to remove {invoking_user_tag}'s profile: \n\t{why}"),
                         LogLevel::Error
                 ));
 

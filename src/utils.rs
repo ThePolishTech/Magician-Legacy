@@ -16,7 +16,7 @@ pub enum LogLevel {
 }
 
 /// Create a string containing a formated log message of give severity, message, and timestamp
-pub fn create_log_message( message: &str, severity: LogLevel ) -> String {
+pub fn create_log_message( message: impl ToString, severity: LogLevel ) -> String {
 
     let current_time = chrono::offset::Local::now();
     let timestamp = current_time.format("%Y-%m-%d | %H:%M:%S").to_string();
@@ -28,7 +28,7 @@ pub fn create_log_message( message: &str, severity: LogLevel ) -> String {
         LogLevel::Info    => " INFO",
     };
 
-    format!("[ {} ]  => {}:  {}", timestamp, log_level_message, message)
+    format!("[ {} ]  => {}:  {}", timestamp, log_level_message, message.to_string())
 }
 
 pub struct EmbedColours;
