@@ -36,3 +36,20 @@ pub const SELECT_BY_NAME_AND_OWNER_ID: &str = "
     FROM Characters
     WHERE fk_discordId = ?1 AND pk_name = ?2;
 ";
+
+/// Get the owner's DiscordID, character's ID, and name for every character in the database
+///
+/// Returns:
+///   - fk_discordId
+///   - pk_characterId
+///   - pk_name
+pub const SELECT_ALL_CHARACTER_IDS_AND_NAME: &str = "
+    SELECT fk_discordId, pk_characterId, pk_name
+    FROM Characters;
+";
+
+pub const GET_NEWEST_CHARACTER_ID: &str = "
+    SELECT MAX(pk_characterId)
+    FROM Characters;
+";
+

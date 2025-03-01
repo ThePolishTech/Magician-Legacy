@@ -1,13 +1,16 @@
 // xxxxxxxxxxxxxxxxx //
 // --== CRATES == -- //
 // xxxxxxxxxxxxxxxxx //
-use std::env;
+use std::{
+    collections::HashMap,
+    env, sync::{Arc, Mutex}
+};
 
 use serenity::{
-    model::gateway::GatewayIntents,
-    Client
+    model::gateway::GatewayIntents, Client
 };
-use sqlx::{sqlite::SqliteConnectOptions, SqlitePool};
+use sqlx::{sqlite::SqliteConnectOptions, SqlitePool, Row};
+use utils::DatabaseCharactersCache;
 
 mod sql_scripts;
 mod event_handler;
@@ -90,18 +93,81 @@ async fn main() {
             let client = event_handler::DiscordBot {
                 database_connection: sqlx_connection
             };
+            println!("Ok");
+        // ==--
+        
+        // --== CREATE AND POPULATE CACHE ==--- //
 
-            match Client::builder( bot_token, gateway_intents ).event_handler(client).await {
-                Ok(client_builder) => {
+            // Firstly, we grab all the characters that currently exist in the database
+            print!("Syncing Cache to Database...");
+            let query_result = sqlx::query( sql_scripts::characters::SELECT_ALL_CHARACTER_IDS_AND_NAME )
+                .fetch_all( &client.database_connection )
+                .await;
+
+            let characters_cache = match query_result {
+                Ok(query_data) => {
+
+                    let mut user_characters_map: HashMap<u64, Vec<(u16, String)>> = HashMap::new();
+                    for entry in query_data.iter() {
+                        
+                        let ( user_id, character_id, character_name ): (u64,u16,String) = (
+                            entry.get(0),
+                            entry.get(1),
+                            entry.get(2)
+                        );
+                        
+                        // If user isn't in the hashmap, insert them with character data
+                        // Else appened character data
+                        match user_characters_map.get_mut(&user_id) {
+                            None => {
+                                user_characters_map.insert(
+                                    user_id,
+                                    vec![(character_id, character_name)]
+                                );
+                            },
+                            Some(characters) => {
+                                characters.push(
+                                    ( character_id, character_name )
+                                );
+                            }
+                        };
+                    }
+
+                    // And finally we return it
                     println!("Ok");
-                    break 'main Ok( client_builder )
+                    user_characters_map
                 },
                 Err(why) => {
                     println!("Error: {}", why);
                     break 'main Err( 1 );
                 }
-            }
+            };
         // ==--
+
+        // --== BUILD CLIENT ==-- // 
+
+            print!("Building Client...");
+            let bot_client = match Client::builder( bot_token, gateway_intents ).event_handler(client).await {
+                Ok(client_builder) => {
+                    println!("Ok");
+
+                    // We insert the cache to allow it to be used in the future
+                    {
+                        let mut data_write = client_builder.data.write().await;
+                        data_write.insert::<DatabaseCharactersCache>(
+                            Arc::new(Mutex::new(  characters_cache  ))
+                        );
+                    }
+                    client_builder
+                },
+                Err(why) => {
+                    println!("Error: {}", why);
+                    break 'main Err( 1 );
+                }
+            };
+        // ==--
+        
+        Ok( bot_client )
     };
 
     // --== START CLIENT ==-- //

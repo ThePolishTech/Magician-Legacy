@@ -9,8 +9,9 @@ use serenity::{
     }, client::Context, model::application::CommandInteraction,
     futures::StreamExt
 };
+use sqlx::Row;
 
-use crate::{event_handler::DiscordBot, sql_scripts::characters, utils::{EmbedColours, create_log_message, LogLevel}};
+use crate::{event_handler::DiscordBot, sql_scripts::characters, utils::{self, create_log_message, DatabaseCharactersCache, EmbedColours, LogLevel}};
 
 
 
@@ -106,6 +107,62 @@ pub async fn handle_modal( interaction_data: &ModalInteraction, ctx: &Context, d
 
         match query_result {
             Ok(_) => {  // We don't need to worry about how many lines got modified
+
+                // get character's SQL given ID
+                let query_result = sqlx::query( characters::GET_NEWEST_CHARACTER_ID )
+                    .fetch_all( &discord_bot.database_connection )
+                    .await
+                    .expect("Should Work");
+
+                let character_id: u16 = query_result[0]
+                    .get(0);
+
+                // --== SYNC CACHE TO DATABASE ==-- //
+
+                // Lock Client.data's DatabaseCharactersCache and insert new character data to it
+                {  // We use brackets to keep the write lock for only as long as we need it
+
+                    let data_write = ctx.data.write().await;
+                    let character_cache_mutex = data_write.get::<DatabaseCharactersCache>()
+                        .expect("Key 'DatabaseCharactersCache' must be in map, as it get's inserted in main.rs");
+
+                    match character_cache_mutex.lock() {
+                        Err(_) => {
+                            // The only way this could error is if the mutex is poisoned. And the
+                            // only way that could happen is if a thread panicked while holding a
+                            // lock to this.
+                            //
+                            // This shouldn't ever occur as We will be designing the bot in such a
+                            // way that it cannot panic while holding a mutex lock.
+                            println!("{}", create_log_message(
+                                    "Poisoned Mutex in /build_character; Cache out of sync",
+                                    LogLevel::Error
+                            ));
+                            break 'return_embed CreateEmbed::new()
+                                .title(format!("{} successfully added, but an unexpected error occured", character_data.0))
+                                .description("Cache is out of sync due to an unexpected error. Please notify Bot Administrator")
+                                .colour(EmbedColours::ERROR)
+                        },
+                        Ok(mut map_guard) => {
+                            match map_guard.get_mut(&invoking_user_id) {
+                                None => {
+                                    map_guard.insert(
+                                        invoking_user_id,
+                                        vec![(character_id, character_data.0.clone())]
+                                    );
+                                },
+                                Some(characters) => {
+                                    characters.push(
+                                        ( character_id, character_data.0.clone() )
+                                    );
+                                }
+                            };
+                        }
+                    };
+
+                    
+                }
+
                 CreateEmbed::new()
                     .title(format!("{} successfully added!", character_data.0))
                     .colour(EmbedColours::GOOD)

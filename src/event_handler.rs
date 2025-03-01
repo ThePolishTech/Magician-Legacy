@@ -74,7 +74,8 @@ impl EventHandler for DiscordBot {
                 commands::register::build(),
                 commands::deregister::build(),
                 commands::build_character::build(),
-                commands::tmp::build()
+                commands::tmp::build(),
+                commands::dump_cache::build()
             ];
 
             if let Err( why ) = Command::set_global_commands( &ctx.http, slash_commands ).await {
@@ -104,11 +105,11 @@ impl EventHandler for DiscordBot {
                     let response_opt = match inbound_command_data.data.name.clone().as_str() {
 
                         "register" => commands::register::run(
-                                &inbound_command_data, &ctx, &self
+                                &inbound_command_data, &ctx, self
                         ).await,
 
                         "deregister" => commands::deregister::run(
-                                &inbound_command_data, &ctx, &self
+                                &inbound_command_data, &ctx, self
                         ).await,
 
                         "tmp" => commands::tmp::run(
@@ -117,6 +118,10 @@ impl EventHandler for DiscordBot {
 
                         "build_character" => commands::build_character::run(
                                 &inbound_command_data, &ctx
+                        ).await,
+
+                        "dump_cache" => commands::dump_cache::run(
+                            &inbound_command_data, &ctx
                         ).await,
 
                         _ => { None }
