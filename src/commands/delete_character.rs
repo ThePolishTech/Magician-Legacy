@@ -1,39 +1,72 @@
-use serenity::{
-    all::{AutocompleteChoice, CommandOptionType, CreateAutocompleteResponse, CreateCommandOption, CreateInteractionResponse}, builder::{
-        CreateCommand, CreateInteractionResponseMessage
-    }, client::Context, model::application::{CommandInteraction, ResolvedValue}
-};
-use crate::utils::{
-    create_log_message, DatabaseCharactersCache, LogLevel
+// Remove a user's character
+//
+// - Dispacted with a slash command, which has an autocomplete field to select character by search
+//     (it returns character ids)
+// - If the code recives a valid character_id that belongs to the user a modal will be dispatched
+//     to the user
+// - The modal will contain one text field, the user will have to type in the character's name to
+//     confirm (The character's name will be given in the modal)
+// - Next up, a database query will remove the character, then if nothing fails the character will
+//     be removed from the character cache
+
+// Temp, to catch rust analyser auto adding stuff
+#[allow(unused_imports, unused_variables)]
+
+use serenity::all::{
+    CommandInteraction, Context, CreateCommand, CreateCommandOption, CreateInteractionResponse, ModalInteraction,
+    AutocompleteChoice, AutocompleteOption, CreateAutocompleteResponse,
+    ResolvedValue
 };
 
+use serenity::{all::CreateInteractionResponseMessage, builder::{
+//    CreateCommand, CreateCommandOption,
+}};
+use toml::value;
+
+use crate::{
+    event_handler::DiscordBot,
+    utils::{
+        DatabaseCharactersCache,
+        create_log_message, LogLevel
+    }
+};
+
+
+/// Build the delete_character's command signature to be sent to Discord's Gateway
 pub fn build() -> CreateCommand {
-    CreateCommand::new("tmp")
-        .description("Testing some stuff")
-        .add_option(CreateCommandOption::new(CommandOptionType::String, "test", "Autocomplete? Please?").set_autocomplete(true).required(true))
+    let options = vec![
+        CreateCommandOption::new(
+                serenity::all::CommandOptionType::Number,
+                "character",
+                "The character to be removed. Must belong to you"
+            )
+            .required(true)
+            .set_autocomplete(true)
+    ];
+
+    CreateCommand::new("delete_character")
+        .description("Remove a character")
+        .set_options(options)
 }
+
+
+// After receiving the event, run it
 pub async fn run( interaction_data: &CommandInteraction, ctx: &Context ) -> Option<CreateInteractionResponse> {
     
-    let option = match interaction_data.data.options()[0].value {
-        ResolvedValue::String( data ) => data,
-        _ => {
-            // This will always be a string, therefor this branch is
-            unreachable!()
-        }
+    let character_id: u16 = match interaction_data.data.options()[0].value {
+        ResolvedValue::Number(num) => num.round() as u16,
+        _ => return None
     };
-    
 
-    let response = CreateInteractionResponse::Message(
-        CreateInteractionResponseMessage::new()
-            .content( option )
-    );
+    let message = CreateInteractionResponseMessage::new()
+        .content( format!("Content: {:#?}", value) );
 
-    if let Err( why ) = interaction_data.create_response( &ctx.http, response).await {
-        print!("{}", why);
-    }
-
+    let _ = interaction_data.create_response(&ctx.http, CreateInteractionResponse::Message(message) ).await;
     None
 }
+
+
+//
 pub async fn handle_autocomplete( interaction_data: &CommandInteraction, ctx: &Context ) {
 
     // We'll need the id of the calling user
@@ -143,7 +176,7 @@ pub async fn handle_autocomplete( interaction_data: &CommandInteraction, ctx: &C
 
         for ( character_id, character_name ) in raw_responses.iter() {
             choices.push(
-                AutocompleteChoice::new(character_name, character_id.to_string())
+                AutocompleteChoice::new(character_name, *character_id )
             );
         }
         choices
@@ -157,5 +190,11 @@ pub async fn handle_autocomplete( interaction_data: &CommandInteraction, ctx: &C
                 LogLevel::Warning
         ))
     }
-    
 }
+
+
+//
+pub async fn handle_modal( interaction_data: &ModalInteraction, ctx: &Context, discord_bot: &DiscordBot ) {
+
+}
+

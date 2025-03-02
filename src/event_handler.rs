@@ -74,6 +74,7 @@ impl EventHandler for DiscordBot {
                 commands::register::build(),
                 commands::deregister::build(),
                 commands::build_character::build(),
+                commands::delete_character::build(),
                 commands::tmp::build(),
                 commands::dump_cache::build()
             ];
@@ -120,6 +121,10 @@ impl EventHandler for DiscordBot {
                                 &inbound_command_data, &ctx
                         ).await,
 
+                        "delete_character" => commands::delete_character::run(
+                                &inbound_command_data, &ctx
+                        ).await,
+
                         "dump_cache" => commands::dump_cache::run(
                             &inbound_command_data, &ctx
                         ).await,
@@ -150,7 +155,15 @@ impl EventHandler for DiscordBot {
                     let interaction_name = inbound_autocomplete_data.data.name.clone();
 
                     match interaction_name.as_str() {
-                        "tmp" => { commands::tmp::handle_autocomplete( &inbound_autocomplete_data, &ctx ).await },
+                        
+                        "tmp" => commands::tmp::handle_autocomplete(
+                                &inbound_autocomplete_data, &ctx
+                        ).await,
+
+                        "delete_character" => commands::delete_character::handle_autocomplete(
+                                &inbound_autocomplete_data, &ctx
+                        ).await,
+
                         _ => {
                             println!( "{}", create_log_message(
                                     format!("Recived unknown autocomplete interaction. Name: {interaction_name}"),
@@ -189,9 +202,15 @@ impl EventHandler for DiscordBot {
                                       // &&str
 
                     match modal_name {
+
                         "build_character" => commands::build_character::handle_modal(
                                 &inbound_modal_data, &ctx, self
                         ).await,
+
+                        "delete_character" => commands::delete_character::handle_modal(
+                                &inbound_modal_data, &ctx, self
+                        ).await,
+
                         _ => {
                             println!( "{}", create_log_message(
                                 format!("Recived unknown modal interaction. Name: {}", modal_name ),
