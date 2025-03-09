@@ -27,7 +27,7 @@ pub async fn run( interaction_data: &CommandInteraction, ctx: &Context ) -> Opti
     let modal_components = vec![
         CreateActionRow::InputText(CreateInputText::new(InputTextStyle::Short, "Character Name", "name")),
         CreateActionRow::InputText(CreateInputText::new(InputTextStyle::Short, "Character Species", "species")),
-        CreateActionRow::InputText(CreateInputText::new(InputTextStyle::Paragraph, "Character Backstory", "Backstory"))
+        CreateActionRow::InputText(CreateInputText::new(InputTextStyle::Paragraph, "Character Backstory", "backstory"))
     ];
 
     let new_modal = CreateModal::new("build_character", "Build a character")

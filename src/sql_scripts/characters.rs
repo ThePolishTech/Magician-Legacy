@@ -53,3 +53,16 @@ pub const GET_NEWEST_CHARACTER_ID: &str = "
     FROM Characters;
 ";
 
+/// Remove a character
+///
+/// Fails:
+///   - This query can fail if foreign keys refer to it
+///
+/// Binds:
+///   - pk_characterId
+pub const REMOVE_CHARACTER: &str = "
+    DELETE
+    FROM Characters
+    WHERE pk_characterId = ?1;
+";
+

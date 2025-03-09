@@ -56,3 +56,23 @@ impl TypeMapKey for DatabaseCharactersCache {
     >>;
 }
 
+/// Blocks the current thread until a clone of the given user's character can be given
+pub fn clone_user_characters(
+    character_map: Arc<Mutex<HashMap<u64, Vec<(u16, String)>>>>,
+    user_id: &u64
+    ) -> Result< Vec<(u16, String)>, String> {
+
+    let map = match character_map.lock() {
+        Ok( map ) => map,
+        Err(why) => return Err( why.to_string() )
+    };
+
+    let user_characters = match map.get(user_id) {
+        Some( vec ) => vec.clone(),
+        None => vec![]
+    };
+
+    Ok( user_characters )
+
+}
+

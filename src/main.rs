@@ -1,3 +1,4 @@
+use core::panic;
 // xxxxxxxxxxxxxxxxx //
 // --== CRATES == -- //
 // xxxxxxxxxxxxxxxxx //
@@ -88,7 +89,7 @@ async fn main() {
                 | GatewayIntents::MESSAGE_CONTENT
                 | GatewayIntents::GUILD_MESSAGE_REACTIONS;
 
-            print!("Building Client...");
+            print!("Setting up Client...");
 
             let client = event_handler::DiscordBot {
                 database_connection: sqlx_connection
@@ -99,7 +100,7 @@ async fn main() {
         // --== CREATE AND POPULATE CACHE ==--- //
 
             // Firstly, we grab all the characters that currently exist in the database
-            print!("Syncing Cache to Database...");
+            print!("Syncing Cache to Database..." );
             let query_result = sqlx::query( sql_scripts::characters::SELECT_ALL_CHARACTER_IDS_AND_NAME )
                 .fetch_all( &client.database_connection )
                 .await;
@@ -109,13 +110,12 @@ async fn main() {
 
                     let mut user_characters_map: HashMap<u64, Vec<(u16, String)>> = HashMap::new();
                     for entry in query_data.iter() {
-                        
                         let ( user_id, character_id, character_name ): (u64,u16,String) = (
                             entry.get(0),
                             entry.get(1),
                             entry.get(2)
                         );
-                        
+
                         // If user isn't in the hashmap, insert them with character data
                         // Else appened character data
                         match user_characters_map.get_mut(&user_id) {
@@ -131,6 +131,7 @@ async fn main() {
                                 );
                             }
                         };
+                        
                     }
 
                     // And finally we return it
