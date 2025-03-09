@@ -33,7 +33,7 @@ async fn main() {
 
             print!("Opening Connection to Database...");
             let sqlite_connection_options = SqliteConnectOptions::new()
-                .filename("kermmaw_db")
+                .filename("kerm-maw_db")
                 .create_if_missing(true);
 
             let database_connection = SqlitePool::connect_with(sqlite_connection_options).await;
